@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>What Was That Called Again? — My Watchlist</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+<style>
+:root{
+  --bg:#0c0e12;
+  --bg2:#101318;
+  --card:#161a21;
+  --card2:#1b2129;
+  --line:#232a34;
+  --line2:#2f3844;
+  --text:#ece9e2;
+  --muted:#98a1b0;
+  --faint:#5f6a78;
+  --gold:#f2c14e;
+  --gold2:#d99a2b;
+  --gold-dim:rgba(242,193,78,.13);
+  --red:#e05252;
+  --green:#5fc98b;
+  --radius:14px;
+  --shadow:0 20px 60px rgba(0,0,0,.5);
+  --serif:Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:
+    radial-gradient(1100px 520px at 88% -12%, rgba(242,193,78,.07), transparent 60%),
+    radial-gradient(900px 620px at -12% 108%, rgba(122,92,214,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+::selection{background:rgba(242,193,78,.3)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#2a313c;border-radius:8px;border:2px solid var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- brand ---------- */
+.brand{display:flex;align-items:center;gap:12px}
+.brand .reel{
+  width:40px;height:40px;border-radius:11px;flex:none;
+  background:linear-gradient(135deg,#f2c14e,#d99a2b);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 4px 14px rgba(242,193,78,.25);
+}
+.brand h1{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:.3px;line-height:1.15}
+.brand small{display:block;font-family:system-ui;font-size:11px;color:var(--faint);font-weight:500;letter-spacing:1.6px;text-transform:uppercase}
+
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 22px;
+  background:rgba(12,14,18,.82);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.header-right{display:flex;align-items:center;gap:10px}
+.chip{
+  font-size:12px;color:var(--muted);background:var(--card);
+  border:1px solid var(--line);padding:6px 12px;border-radius:999px;white-space:nowrap;
+}
+.chip b{color:var(--gold);font-weight:600}
+
+/* ---------- buttons ---------- */
+.btn{
+  appearance:none;border:1px solid transparent;cursor:pointer;border-radius:10px;
+  font-size:14px;font-weight:600;padding:9px 16px;transition:all .15s ease;
+  display:inline-flex;align-items:center;gap:7px;font-family:inherit;
+}
+.btn:active{transform:scale(.97)}
+.btn-gold{
+  background:linear-gradient(135deg,#f2c14e,#e3a637);color:#201503;
+  box-shadow:0 4px 16px rgba(242,193,78,.22);
+}
+.btn-gold:hover{filter:brightness(1.08)}
+.btn-ghost{background:var(--card2);color:var(--text);border-color:var(--line2)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:rgba(224,82,82,.12);color:#ff8a8a;border-color:rgba(224,82,82,.35)}
+.btn-danger:hover{background:rgba(224,82,82,.22)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.icon-btn{
+  appearance:none;background:var(--card);border:1px solid var(--line);color:var(--muted);
+  width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:15px;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.icon-btn:hover{color:var(--gold);border-color:var(--gold)}
+.linklike{background:none;border:none;color:var(--gold);cursor:pointer;font-size:inherit;font-family:inherit;text-decoration:underline;text-underline-offset:3px}
+.linklike:hover{color:#ffd77e}
+
+/* ---------- main layout ---------- */
+main{max-width:1180px;margin:0 auto;padding:26px 22px 80px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.stat{
+  background:linear-gradient(180deg,var(--card),var(--bg2));
+  border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;
+}
+.stat .n{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--gold)}
+.stat .l{font-size:11.5px;color:var(--faint);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px}
+
+/* toolbar */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:20px}
+.tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tab{
+  appearance:none;background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:9px;transition:all .15s;font-family:inherit;
+}
+.tab:hover{color:var(--text)}
+.tab.on{background:linear-gradient(135deg,#f2c14e,#e3a637);color:#201503}
+.tab .cnt{opacity:.65;font-weight:700}
+.search-box{flex:1;min-width:180px;position:relative}
+.search-box input, .text-input, select.text-input{
+  width:100%;background:#0e1116;border:1px solid var(--line);color:var(--text);
+  border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;transition:border .15s;
+}
+.search-box input:focus,.text-input:focus,select.text-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.search-box input{padding-left:36px}
+.search-box .mag{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:14px;pointer-events:none}
+select.text-input{width:auto;cursor:pointer}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:18px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  display:flex;flex-direction:column;
+}
+.card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.poster-box{position:relative;aspect-ratio:2/3;background:linear-gradient(160deg,#1b2028,#101319);overflow:hidden}
+.poster-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+.card:hover .poster-box img{transform:scale(1.05)}
+.poster-box.noposter::after{
+  content:'🎬';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:44px;opacity:.55;
+}
+.card-body{padding:11px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
+.card-title{font-family:var(--serif);font-size:14.5px;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.badge{
+  font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  padding:2.5px 7px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);
+}
+.badge.series{background:var(--gold-dim);border-color:rgba(242,193,78,.35);color:var(--gold)}
+.badge.movie{background:rgba(122,92,214,.12);border-color:rgba(122,92,214,.35);color:#b7a1ff}
+.card-stars{font-size:12.5px;letter-spacing:1px;line-height:1}
+.card-comment{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic}
+.card-date{font-size:10.5px;color:var(--faint);margin-top:auto}
+
+/* empty state */
+.empty{text-align:center;padding:70px 20px;color:var(--faint)}
+.empty .big{font-size:56px;margin-bottom:14px}
+.empty h2{font-family:var(--serif);color:var(--muted);font-size:20px;margin-bottom:8px}
+.empty p{font-size:14px;margin-bottom:20px}
+
+/* ---------- stars ---------- */
+.stars{display:inline-flex;gap:2px;color:#454d59}
+.stars .on{color:var(--gold);text-shadow:0 0 10px rgba(242,193,78,.45)}
+.stars.big{font-size:22px}
+.stars.small{font-size:12px;gap:1px}
+.rate-wrap{display:inline-flex;gap:3px}
+.rate-wrap .star{
+  appearance:none;background:none;border:none;cursor:pointer;font-size:30px;line-height:1;
+  color:#3a414c;transition:transform .1s,color .1s;padding:2px;
+}
+.rate-wrap .star:hover{transform:scale(1.18)}
+.rate-wrap .star.on{color:var(--gold);text-shadow:0 0 12px rgba(242,193,78,.5)}
+.rate-wrap .star.off:hover{color:#6b7077}
+
+/* ---------- modals ---------- */
+.modal{
+  position:fixed;inset:0;z-index:100;display:none;
+  align-items:flex-start;justify-content:center;overflow-y:auto;padding:34px 16px;
+  background:rgba(5,6,9,.74);backdrop-filter:blur(7px);
+}
+.modal.open{display:flex}
+.modal-panel{
+  background:linear-gradient(180deg,#141820,#10131a);
+  border:1px solid var(--line2);border-radius:18px;box-shadow:var(--shadow);
+  width:100%;max-width:560px;margin:auto;padding:24px;position:relative;
+  animation:pop .2s ease;
+}
+.modal-panel.wide{max-width:940px}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.modal-head h2{font-family:var(--serif);font-size:20px}
+.modal-x{
+  appearance:none;background:var(--card2);border:1px solid var(--line2);color:var(--muted);
+  width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:14px;line-height:1;flex:none;
+}
+.modal-x:hover{color:#ff8a8a;border-color:var(--red)}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+/* login */
+#login-screen{
+  position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:
+    radial-gradient(900px 480px at 80% -10%, rgba(242,193,78,.09), transparent 55%),
+    radial-gradient(700px 500px at 10% 110%, rgba(122,92,214,.08), transparent 55%),
+    var(--bg);
+}
+#login-screen.hidden{display:none}
+.login-card{width:100%;max-width:420px;text-align:center}
+.login-card .brand{justify-content:center;margin-bottom:8px}
+.login-card .brand h1{font-size:24px}
+.login-sub{color:var(--muted);font-size:13.5px;margin-bottom:24px}
+.login-tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px}
+.login-tabs .tab{flex:1}
+.login-body{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px;text-align:left}
+.login-body input{
+  width:100%;background:#0e1116;border:1px solid var(--line);color:var(--text);
+  border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;transition:border .15s;
+}
+.login-body input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.login-msg{font-size:13px;line-height:1.45;min-height:0;border-radius:9px;padding:10px 12px;display:none}
+.login-msg.show{display:block}
+.login-msg.err{background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);color:#ffa1a1}
+.login-msg.ok{background:rgba(95,201,139,.08);border:1px solid rgba(95,201,139,.3);color:#9be0ba}
+.login-alt{margin-top:4px;font-size:12.5px;color:var(--faint);text-align:center}
+.login-hint{font-size:11.5px;color:var(--faint);line-height:1.45;margin-top:18px}
+
+/* add modal */
+#add-search{display:flex;gap:10px}
+#add-search input{flex:1;background:#0e1116;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none}
+#add-search input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px;max-height:46vh;overflow-y:auto;padding-right:4px}
+.res-card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s;text-align:left;font-family:inherit}
+.res-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.res-card .poster-box{aspect-ratio:2/3}
+.res-card .r-body{padding:9px 11px}
+.res-card .r-title{font-family:var(--serif);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-card .r-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.res-note{font-size:12px;color:var(--faint);margin-top:14px;text-align:center}
+.add-manual{font-size:13px;margin-top:14px;text-align:center}
+
+/* add form / detail */
+.detail-grid{display:grid;grid-template-columns:250px 1fr;gap:24px}
+@media (max-width:700px){.detail-grid{grid-template-columns:1fr}}
+.detail-grid .poster-box{border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.dm-title{font-family:var(--serif);font-size:26px;line-height:1.2}
+.dm-year{color:var(--muted);font-weight:400}
+.dm-meta{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.chip2{font-size:11.5px;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.chip2 b{color:var(--text);font-weight:600}
+.sec{margin-top:22px}
+.sec h3{
+  font-family:var(--serif);font-size:15px;color:var(--gold);letter-spacing:.6px;
+  text-transform:uppercase;font-size:12.5px;font-weight:700;letter-spacing:1.4px;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.sec h3::after{content:'';flex:1;height:1px;background:var(--line)}
+.sec p.plot{font-size:14px;line-height:1.65;color:#cfd3da}
+.crew{display:flex;flex-direction:column;gap:8px;font-size:13.5px}
+.crew .row{display:flex;gap:10px;align-items:baseline}
+.crew .row .k{color:var(--faint);font-size:11px;letter-spacing:1.1px;text-transform:uppercase;flex:none;width:74px}
+.crew .row .v{color:#cfd3da;line-height:1.5}
+.ratings{display:flex;flex-wrap:wrap;gap:8px}
+.rating-tag{
+  background:var(--card2);border:1px solid var(--line2);border-radius:10px;padding:8px 14px;
+  font-size:13px;display:flex;align-items:center;gap:8px;
+}
+.rating-tag .src{color:var(--faint);font-size:11.5px;text-transform:uppercase;letter-spacing:.6px}
+.rating-tag .val{font-weight:700}
+.notes-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.notes-box .label{font-size:11px;color:var(--faint);letter-spacing:1.1px;text-transform:uppercase;margin-bottom:8px}
+.notes-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.note-comment{font-size:14px;color:#cfd3da;line-height:1.55;white-space:pre-wrap}
+textarea.comment-input{
+  width:100%;background:#0e1116;border:1px solid var(--line);color:var(--text);border-radius:10px;
+  padding:10px 12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:72px;
+}
+textarea.comment-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+
+/* episodes */
+.season-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.s-pill{
+  appearance:none;background:var(--card2);border:1px solid var(--line2);color:var(--muted);
+  border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.s-pill:hover{color:var(--text)}
+.s-pill.on{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.ep-list{display:flex;flex-direction:column;gap:6px}
+.ep-row{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ep-head{
+  width:100%;background:none;border:none;color:var(--text);font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;gap:12px;padding:10px 14px;text-align:left;transition:background .15s;
+}
+.ep-head:hover{background:var(--card2)}
+.ep-num{font-size:11px;font-weight:700;color:var(--gold);background:var(--gold-dim);border-radius:7px;padding:3px 7px;flex:none;letter-spacing:.5px}
+.ep-name{font-size:13.5px;font-weight:600;flex:1;min-width:0}
+.ep-meta{font-size:11.5px;color:var(--faint);flex:none;display:flex;gap:10px}
+.ep-body{display:none;padding:0 14px 13px;font-size:13px;line-height:1.6;color:#b9c0cb;border-top:1px dashed var(--line);margin:0 0 0 0}
+.ep-row.open .ep-body{display:block;padding-top:11px}
+.ep-chev{color:var(--faint);font-size:10px;flex:none;transition:transform .2s}
+.ep-row.open .ep-chev{transform:rotate(180deg)}
+.ep-loading,.section-loading{color:var(--faint);font-size:13px;padding:10px 2px}
+
+/* settings */
+.set-field{margin-bottom:14px}
+.set-field label{display:block;font-size:11px;color:var(--faint);letter-spacing:1.1px;text-transform:uppercase;margin-bottom:6px}
+.set-field input[type=text],.set-field input[type=password]{width:100%;background:#0e1116;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font-size:13.5px;font-family:inherit;outline:none}
+.set-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.check-row{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--muted);cursor:pointer}
+.check-row input{accent-color:var(--gold);width:16px;height:16px}
+details.setup{margin-top:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+details.setup summary{cursor:pointer;padding:11px 14px;font-size:13px;color:var(--gold);font-weight:600;user-select:none}
+details.setup summary:hover{background:var(--card)}
+details.setup pre{
+  background:#0a0d11;padding:14px;font-size:11px;line-height:1.5;color:#9fd0a8;
+  overflow-x:auto;border-top:1px solid var(--line);max-height:300px;overflow-y:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+.mode-note{font-size:12px;color:var(--faint);line-height:1.5;margin-top:10px;background:var(--gold-dim);border:1px solid rgba(242,193,78,.25);border-radius:10px;padding:10px 12px;color:#d8c08a}
+
+/* confirm modal */
+.confirm-text{font-size:14.5px;line-height:1.6;color:#cfd3da}
+
+/* toasts */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:300;display:flex;flex-direction:column;gap:9px;max-width:340px}
+.toast{
+  background:#171b22;border:1px solid var(--line2);border-left:3px solid var(--gold);
+  border-radius:11px;padding:12px 15px;font-size:13.5px;box-shadow:var(--shadow);
+  animation:slidein .25s ease;cursor:pointer;color:var(--text);
+}
+.toast.ok{border-left-color:var(--green)}
+.toast.err{border-left-color:var(--red)}
+@keyframes slidein{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(242,193,78,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="brand"><div class="reel">🎬</div><h1>What Was That<br>Called Again?</h1></div>
+    <p class="login-sub" id="login-sub">Sign in to sync your watchlist to your own Supabase cloud database.</p>
+    <div class="login-tabs">
+      <button class="tab on" data-action="login-mode" data-mode="in" id="tab-in">Sign in</button>
+      <button class="tab" data-action="login-mode" data-mode="up" id="tab-up">Create account</button>
+    </div>
+    <div class="login-body">
+      <input id="login-email" type="email" placeholder="you@email.com" autocomplete="email">
+      <input id="login-pass" type="password" placeholder="Password (at least 8 characters)" autocomplete="current-password">
+      <div id="login-forgot" style="display:none;text-align:right;margin-top:-4px">
+        <button class="linklike" data-action="forgot">Forgot password?</button>
+      </div>
+      <button class="btn btn-gold" data-action="login-submit" id="login-btn" style="justify-content:center">Sign in</button>
+      <div class="login-msg" id="login-msg"></div>
+      <p class="login-alt">Just browsing? <button class="linklike" data-action="go-local">continue locally without an account</button></p>
+    </div>
+    <p class="login-hint">Your data lives in a Supabase project you own — this page never stores your watchlist on any third-party server.</p>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" style="display:none">
+  <header>
+    <div class="brand">
+      <div class="reel">🎬</div>
+      <h1>What Was That Called Again?<small>the watchlist that remembers</small></h1>
+    </div>
+    <div class="header-right">
+      <span class="chip" id="mode-chip"></span>
+      <button class="icon-btn" data-action="open-settings" title="Settings">⚙</button>
+      <button class="btn btn-ghost" data-action="logout" id="logout-btn" style="display:none;padding:7px 12px;font-size:12.5px">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-action="tab" data-filter="all" id="tab-all">All <span class="cnt"></span></button>
+        <button class="tab" data-action="tab" data-filter="movie" id="tab-movie">🎥 Movies <span class="cnt"></span></button>
+        <button class="tab" data-action="tab" data-filter="series" id="tab-series">📺 TV <span class="cnt"></span></button>
+      </div>
+      <div class="search-box">
+        <span class="mag">🔍</span>
+        <input id="list-search" type="text" placeholder="Filter your list…" autocomplete="off">
+      </div>
+      <select class="text-input" id="sort-select" title="Sort">
+        <option value="recent">Recently watched</option>
+        <option value="oldest">Oldest first</option>
+        <option value="rating">Highest rated</option>
+        <option value="title">Title A–Z</option>
+      </select>
+      <button class="btn btn-gold" data-action="open-add">＋ Add</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="empty" id="empty" style="display:none">
+      <div class="big">🍿</div>
+      <h2>Nothing here yet</h2>
+      <p>Search for the film or show you've watched and add it in one tap.</p>
+      <button class="btn btn-gold" data-action="open-add">＋ Add your first title</button>
+    </div>
+  </main>
+</div>
+
+<!-- ================= ADD MODAL ================= -->
+<div class="modal" id="add-modal">
+  <div class="modal-panel wide">
+    <div class="modal-head">
+      <h2 id="add-head">Add what you watched</h2>
+      <button class="modal-x" data-action="close-modal" data-modal="add-modal" title="Close">✕</button>
+    </div>
+    <div id="add-view-search">
+      <div id="add-search">
+        <input id="add-q" type="text" placeholder="Search by title… e.g. Inception" autocomplete="off">
+        <button class="btn btn-gold" data-action="do-search">Search</button>
+      </div>
+      <div class="results" id="add-results"></div>
+      <p class="add-manual">Can't find it? <button class="linklike" data-action="manual-add">Add it manually</button></p>
+    </div>
+    <div id="add-view-form" style="display:none">
+      <button class="btn btn-ghost" data-action="back-to-search" style="padding:6px 12px;font-size:12.5px;margin-bottom:16px">← New search</button>
+      <div id="add-form-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DETAIL MODAL ================= -->
+<div class="modal" id="detail-modal">
+  <div class="modal-panel wide" id="detail-panel"></div>
+</div>
+
+<!-- ================= SETTINGS MODAL ================= -->
+<div class="modal" id="settings-modal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h2>Settings</h2>
+      <button class="modal-x" data-action="close-modal" data-modal="settings-modal" title="Close">✕</button>
+    </div>
+    <div class="set-field">
+      <label>Supabase project URL</label>
+      <input type="text" id="set-url" placeholder="https://yourproject.supabase.co" autocomplete="off">
+    </div>
+    <div class="set-field">
+      <label>Supabase anon (public) key</label>
+      <input type="password" id="set-anon" placeholder="eyJhbGciOi…" autocomplete="off">
+    </div>
+    <div class="set-field">
+      <label>OMDB API key</label>
+      <input type="text" id="set-omdb" autocomplete="off">
+    </div>
+    <label class="check-row">
+      <input type="checkbox" id="set-tvmaze"> Fetch episode synopses from TVmaze (free, no key)
+    </label>
+    <details class="setup">
+      <summary>First time here? Supabase setup steps</summary>
+      <pre>1. Create a free project at https://supabase.com
+2. In the left sidebar open the SQL Editor
+3. Paste and run this whole script (also in supabase.sql):
+
+create table if not exists public.watched (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  imdb_id text,
+  tvmaze_id integer,
+  title text not null,
+  year text,
+  type text not null default 'movie',
+  poster text,
+  plot text,
+  runtime text,
+  genre text,
+  director text,
+  actors text,
+  imdb_rating text,
+  rating smallint check (rating between 1 and 5),
+  comment text,
+  watched_on date not null default current_date,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.watched enable row level security;
+create policy "own select" on public.watched for select to authenticated using (auth.uid() = user_id);
+create policy "own insert" on public.watched for insert to authenticated with check (auth.uid() = user_id);
+create policy "own update" on public.watched for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own delete" on public.watched for delete to authenticated using (auth.uid() = user_id);
+create index if not exists watched_user_idx on public.watched(user_id, watched_on desc);
+
+4. Project Settings → API: copy the Project URL and anon key
+5. Paste them above and click Save — then sign up with your email.</pre>
+    </details>
+    <p class="mode-note" id="settings-note"></p>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-action="close-modal" data-modal="settings-modal">Cancel</button>
+      <button class="btn btn-gold" data-action="settings-save">Save & reload</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CONFIRM MODAL ================= -->
+<div class="modal" id="confirm-modal">
+  <div class="modal-panel" style="max-width:420px">
+    <div class="modal-head"><h2 id="confirm-title">Are you sure?</h2></div>
+    <p class="confirm-text" id="confirm-text"></p>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-action="confirm-no">Cancel</button>
+      <button class="btn btn-danger" data-action="confirm-yes" id="confirm-yes">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+'use strict';
+/* ================================================================
+   WHAT WAS THAT CALLED AGAIN? — a personal film & TV watchlist
+   Single-file app. No build step, no dependencies.
+   Data: Supabase (cloud) with automatic localStorage fallback.
+   Info: OMDB API for search/details + TVmaze for episode synopses.
+   ================================================================ */
+
+/* ---------------- config (edit here or via the ⚙ Settings) ---------------- */
+const DEFAULT_CONFIG = {
+  supabaseUrl:   '',                  // e.g. https://xxxx.supabase.co
+  supabaseAnonKey: '',                // anon/public key (safe in client apps)
+  omdbApiKey:    'f677881d',          // your OMDB key
+  useTvmaze:     true                 // per-episode synopses for TV shows
+};
+const LS = {
+  settings: 'wwtca.settings',
+  session:  'wwtca.session',
+  entries:  'wwtca.local.entries',
+  cache:    'wwtca.cache'
+};
+
+/* ---------------- safe storage (works even in sandboxed previews) ---------------- */
+const mem = {};
+function lsGet(k, d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch(e){ return (k in mem) ? mem[k] : d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ mem[k] = v; } }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){ delete mem[k]; } }
+
+let settings = Object.assign({}, DEFAULT_CONFIG, lsGet(LS.settings, {}));
+
+/* ---------------- utils ---------------- */
+const $  = (s, r) => (r||document).querySelector(s);
+const $$ = (s, r) => Array.from((r||document).querySelectorAll(s));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stripHtml = h => { const d = document.createElement('div'); d.innerHTML = h||''; return d.textContent.trim(); };
+function uid(){
+  try{ if(crypto.randomUUID) return crypto.randomUUID(); }catch(e){}
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); });
+}
+function todayStr(){
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function fmtDate(s){
+  if(!s) return '';
+  const d = new Date(s.length<=10 ? s+'T00:00:00' : s);
+  if(isNaN(d)) return s;
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+}
+function cacheGet(key, maxAgeMs){
+  const c = lsGet(LS.cache, {}) || {};
+  const e = c[key];
+  if(e && Date.now() - e.ts < maxAgeMs) return e.data;
+  return undefined;
+}
+function cacheSet(key, data){
+  const c = lsGet(LS.cache, {}) || {};
+  c[key] = {ts: Date.now(), data};
+  // keep cache from growing forever
+  const keys = Object.keys(c);
+  if(keys.length > 200){ keys.slice(0, keys.length-200).forEach(k => delete c[k]); }
+  lsSet(LS.cache, c);
+}
+
+/* ---------------- state ---------------- */
+const state = {
+  mode: 'local',          // 'local' | 'cloud'
+  session: null,          // supabase session
+  entries: [],
+  filter: 'all',
+  sort: 'recent',
+  q: '',
+  add: null,              // pending add {omdb, tvmazeId, rating, comment, watchedOn}
+  detail: null,           // open detail {entry, omdb, episodes, season, expanded:Set}
+  confirm: null           // {title, text, yesLabel, onYes}
+};
+
+/* ---------------- toast ---------------- */
+function toast(msg, type){
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type||'');
+  t.textContent = msg;
+  t.onclick = () => t.remove();
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(), 400); }, 3800);
+}
+
+/* ---------------- Supabase client (REST — no SDK needed) ---------------- */
+async function sbReq(method, path, body, {auth=true, retry=true}={}){
+  if(!settings.supabaseUrl || !settings.supabaseAnonKey) throw new Error('Supabase is not configured. Open ⚙ Settings.');
+  const url = settings.supabaseUrl.replace(/\/+$/,'') + path;
+  const headers = { apikey: settings.supabaseAnonKey, 'Content-Type': 'application/json' };
+  if(auth){
+    if(!state.session || !state.session.access_token) throw new Error('Not signed in.');
+    headers.Authorization = 'Bearer ' + state.session.access_token;
+  }
+  let res;
+  try{ res = await fetch(url, {method, headers, body: body?JSON.stringify(body):undefined}); }
+  catch(e){ throw new Error('Cannot reach Supabase at ' + settings.supabaseUrl + '. Check your URL/key in ⚙ Settings.'); }
+  if(res.status === 401 && auth && retry && state.session){
+    const ok = await refreshSession();
+    if(ok) return sbReq(method, path, body, {auth, retry:false});
+    throw new Error('Session expired — please sign in again.');
+  }
+  if(!res.ok){
+    let msg = 'Request failed (' + res.status + ')';
+    try{
+      const j = await res.json();
+      if(j.error_description) msg = j.error_description;
+      else if(j.message) msg = j.message;
+      else if(j.error) msg = j.error;
+      else if(j.details) msg = j.details;
+    }catch(e){}
+    throw new Error(msg);
+  }
+  if(res.status === 204) return null;
+  const ct = res.headers.get('content-type')||'';
+  return ct.includes('json') ? res.json() : res.text();
+}
+
+const AUTH = {
+  signup(email, password){
+    return sbReq('POST', '/auth/v1/signup', {email, password}, {auth:false});
+  },
+  login(email, password){
+    return sbReq('POST', '/auth/v1/token?grant_type=password', {email, password}, {auth:false});
+  },
+  refresh(token){
+    return sbReq('POST', '/auth/v1/token?grant_type=refresh_token', {refresh_token:token}, {auth:false});
+  },
+  recover(email){
+    return sbReq('POST', '/auth/v1/recover', {email}, {auth:false});
+  },
+  logout(){
+    return sbReq('POST', '/auth/v1/logout', {}, {auth:true, retry:false});
+  }
+};
+
+function saveSession(s){
+  if(!s) return;
+  state.session = {
+    access_token: s.access_token,
+    refresh_token: s.refresh_token,
+    expires_at: Date.now() + (parseInt(s.expires_in,10)||3600)*1000 - 60*1000,
+    email: (s.user && (s.user.email)) || (s.email) || ''
+  };
+  lsSet(LS.session, state.session);
+}
+function clearSession(){ state.session = null; lsDel(LS.session); }
+async function refreshSession(){
+  try{
+    const s = lsGet(LS.session, null);
+    if(!s || !s.refresh_token) return false;
+    const r = await AUTH.refresh(s.refresh_token);
+    if(r && r.access_token){ saveSession(r); return true; }
+    return false;
+  }catch(e){ return false; }
+}
+async function ensureSession(){
+  const s = lsGet(LS.session, null);
+  if(!s) return false;
+  state.session = s;
+  if(s.expires_at && Date.now() > s.expires_at){
+    if(!(await refreshSession())) { clearSession(); return false; }
+  }
+  return true;
+}
+
+/* data */
+async function dbList(){
+  return sbReq('GET', '/rest/v1/watched?select=*&order=watched_on.desc,created_at.desc');
+}
+async function dbInsert(row){
+  return sbReq('POST', '/rest/v1/watched', row, {auth:true});
+}
+async function dbUpdate(id, patch){
+  return sbReq('PATCH', '/rest/v1/watched?id=eq.'+encodeURIComponent(id), patch, {auth:true});
+}
+async function dbDelete(id){
+  return sbReq('DELETE', '/rest/v1/watched?id=eq.'+encodeURIComponent(id), null, {auth:true});
+}
+
+/* ---------------- local storage DB (fallback) ---------------- */
+function localList(){ return lsGet(LS.entries, []); }
+function localWrite(rows){ lsSet(LS.entries, rows); }
+function localInsert(row){ const rows = localList(); rows.unshift(row); localWrite(rows); return row; }
+function localUpdate(id, patch){ const rows = localList().map(r => r.id===id ? Object.assign({}, r, patch, {updated_at:new Date().toISOString()}) : r); localWrite(rows); return rows.find(r=>r.id===id); }
+function localDelete(id){ localWrite(localList().filter(r => r.id !== id)); }
+
+/* ---------------- unified data layer ---------------- */
+async function loadEntries(){
+  state.entries = state.mode==='cloud' ? await dbList() : localList();
+}
+async function addEntry(row){
+  if(state.mode==='cloud'){
+    const r = await dbInsert(row);
+    state.entries.unshift(r && r[0] ? r[0] : row);
+  } else {
+    localInsert(row);
+    state.entries.unshift(row);
+  }
+}
+async function updateEntry(id, patch){
+  if(state.mode==='cloud'){
+    const r = await dbUpdate(id, patch);
+    const updated = r && r[0] ? r[0] : Object.assign({}, state.entries.find(e=>e.id===id), patch);
+    state.entries = state.entries.map(e => e.id===id ? updated : e);
+    return updated;
+  }
+  const updated = localUpdate(id, patch);
+  state.entries = state.entries.map(e => e.id===id ? updated : e);
+  return updated;
+}
+async function deleteEntry(id){
+  if(state.mode==='cloud') await dbDelete(id);
+  else localDelete(id);
+  state.entries = state.entries.filter(e => e.id !== id);
+}
+
+/* ---------------- external APIs ---------------- */
+async function omdbSearch(q){
+  // note: OMDB rejects a comma-separated type= param, so search all and filter here
+  const url = 'https://www.omdbapi.com/?apikey=' + encodeURIComponent(settings.omdbApiKey) + '&s=' + encodeURIComponent(q);
+  const r = await fetch(url);
+  const j = await r.json();
+  if(j.Response === 'False') throw new Error(j.Error || 'No results');
+  return (j.Search||[]).filter(x => x.Type === 'movie' || x.Type === 'series');
+}
+async function omdbDetail(id, plot){
+  const cacheKey = 'omdb:'+id+':'+(plot||'short');
+  const cached = cacheGet(cacheKey, 24*3600*1000);
+  if(cached) return cached;
+  const url = 'https://www.omdbapi.com/?apikey=' + encodeURIComponent(settings.omdbApiKey) + '&i=' + encodeURIComponent(id) + '&plot=' + (plot||'short');
+  const r = await fetch(url);
+  const j = await r.json();
+  if(j.Response === 'False') throw new Error(j.Error || 'Not found on OMDB');
+  cacheSet(cacheKey, j);
+  return j;
+}
+async function omdbSeason(id, season){
+  const cacheKey = 'omdbseason:'+id+':'+season;
+  const cached = cacheGet(cacheKey, 24*3600*1000);
+  if(cached) return cached;
+  const url = 'https://www.omdbapi.com/?apikey=' + encodeURIComponent(settings.omdbApiKey) + '&i=' + encodeURIComponent(id) + '&Season=' + season;
+  const r = await fetch(url);
+  const j = await r.json();
+  if(j.Response === 'False') throw new Error(j.Error || 'Not found');
+  cacheSet(cacheKey, j);
+  return j;
+}
+/* TVmaze: the imdb= lookup endpoint is unreliable, so resolve via search when needed */
+async function tvmazeResolve(imdbId, title, year){
+  const cacheKey = 'tvmres:'+(imdbId||title);
+  const cached = cacheGet(cacheKey, 7*24*3600*1000);
+  if(cached) return cached;
+  try{
+    let r = await fetch('https://api.tvmaze.com/search/shows?q=' + encodeURIComponent(title||''));
+    let list = await r.json();
+    if(!Array.isArray(list) || !list.length) return null;
+    const norm = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+    let pick = list.find(x => x.show.externals && imdbId && x.show.externals.imdb === imdbId) || null;
+    if(!pick) pick = list.find(x => norm(x.show.name) === norm(title)) || null;
+    if(!pick && year) pick = list.find(x => String(x.show.premiered||'').slice(0,4) === String(year)) || null;
+    const show = (pick || list[0]).show;
+    const out = {id: show.id, name: show.name, year: (show.premiered||'').slice(0,4)};
+    cacheSet(cacheKey, out);
+    return out;
+  }catch(e){ return null; }
+}
+async function tvmazeEpisodes(showId){
+  const cacheKey = 'tvmep:'+showId;
+  const cached = cacheGet(cacheKey, 24*3600*1000);
+  if(cached) return cached;
+  const r = await fetch('https://api.tvmaze.com/shows/' + showId + '/episodes');
+  if(!r.ok) throw new Error('TVmaze episode fetch failed');
+  const j = await r.json();
+  cacheSet(cacheKey, j);
+  return j;
+}
+
+/* ---------------- stars ---------------- */
+function starsHTML(value, cls){
+  cls = cls || '';
+  let h = '<span class="stars ' + cls + '">';
+  for(let i=1;i<=5;i++) h += '<span class="' + (i<=value?'on':'') + '">★</span>';
+  return h + '</span>';
+}
+function makeStars(container, value, onChange){
+  container.innerHTML = '';
+  container.className = 'rate-wrap';
+  let cur = value||0, hover = 0;
+  const paint = () => {
+    const v = hover || cur;
+    $$('.star', container).forEach((b,i) => b.classList.toggle('on', i < v));
+  };
+  for(let i=1;i<=5;i++){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'star' + (i<=cur?' on':''); b.textContent = '★';
+    b.setAttribute('aria-label', i + ' star' + (i>1?'s':''));
+    b.addEventListener('mouseenter', () => { hover = i; paint(); });
+    b.addEventListener('click', () => { cur = i; hover = 0; paint(); if(onChange) onChange(i); });
+    container.appendChild(b);
+  }
+  container.addEventListener('mouseleave', () => { hover = 0; paint(); });
+}
+
+/* ---------------- login screen ---------------- */
+let loginMode = 'in';
+function showLogin(msg){
+  $('#login-screen').classList.remove('hidden');
+  $('#app').style.display = 'none';
+  if(msg){ const el = $('#login-msg'); el.textContent = msg; el.className = 'login-msg show ' + (msg.startsWith('✅')?'ok':'err'); }
+}
+function showApp(){ $('#login-screen').classList.add('hidden'); $('#app').style.display = 'block'; }
+function setLoginMode(m){
+  loginMode = m;
+  $('#tab-in').classList.toggle('on', m==='in');
+  $('#tab-up').classList.toggle('on', m==='up');
+  $('#login-btn').textContent = m==='in' ? 'Sign in' : 'Create account';
+  $('#login-forgot').style.display = m==='in' ? 'block' : 'none';
+  $('#login-pass').placeholder = m==='in' ? 'Password' : 'Password (at least 8 characters)';
+  $('#login-pass').autocomplete = m==='in' ? 'current-password' : 'new-password';
+  const m2 = $('#login-msg'); m2.className='login-msg'; m2.textContent='';
+  $('#login-sub').textContent = m==='in'
+    ? 'Sign in to sync your watchlist to your own Supabase cloud database.'
+    : 'Create an account — your watchlist is stored privately in your Supabase project.';
+}
+function loginMsg(msg, ok){
+  const el = $('#login-msg');
+  el.textContent = (ok?'✅ ':'⚠️ ') + msg;
+  el.className = 'login-msg show ' + (ok?'ok':'err');
+}
+async function doLogin(){
+  const email = $('#login-email').value.trim();
+  const pass = $('#login-pass').value;
+  if(!email || !pass) return loginMsg('Enter your email and password.');
+  const btn = $('#login-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try{
+    if(loginMode === 'in'){
+      const r = await AUTH.login(email, pass);
+      saveSession(r);
+      await enterApp();
+    } else {
+      if(pass.length < 8) return loginMsg('Password must be at least 8 characters.');
+      const r = await AUTH.signup(email, pass);
+      if(r.access_token){
+        saveSession(r);
+        loginMsg('Account created — welcome!', true);
+        await enterApp();
+      } else {
+        loginMsg('Account created! Check your inbox and click the confirmation link, then sign in.', true);
+      }
+    }
+  }catch(e){
+    let m = e.message;
+    if(/invalid login|invalid_grant/i.test(m)) m = 'Incorrect email or password.';
+    else if(/not confirmed/i.test(m)) m = 'Email not confirmed yet — check your inbox for the confirmation link.';
+    else if(/already registered/i.test(m)) m = 'An account with this email already exists — try signing in.';
+    loginMsg(m);
+  }finally{
+    btn.disabled = false; btn.textContent = loginMode==='in' ? 'Sign in' : 'Create account';
+  }
+}
+async function doForgot(){
+  const email = $('#login-email').value.trim();
+  if(!email) return loginMsg('Enter your email address first.');
+  try{ await AUTH.recover(email); loginMsg('If that email exists, a password reset link has been sent.', true); }
+  catch(e){ loginMsg(e.message); }
+}
+async function enterApp(){
+  showApp();
+  try{ await loadEntries(); }catch(e){ console.error(e); toast('Could not load your watchlist: '+e.message, 'err'); state.entries = []; }
+  renderAll();
+  toast('Welcome' + (state.session&&state.session.email ? ', ' + state.session.email.split('@')[0] : '') + ' — you have ' + state.entries.length + ' title' + (state.entries.length===1?'':'s') + '.');
+}
+function goLocal(){
+  state.mode = 'local';
+  state.session = null;
+  showApp();
+  loadEntries().then(()=>{ renderAll(); toast('Local mode — your entries are stored in this browser only. Configure Supabase in ⚙ to sync across devices.', ''); });
+}
+
+/* ---------------- list rendering ---------------- */
+function visibleEntries(){
+  let rows = state.entries.slice();
+  if(state.filter !== 'all') rows = rows.filter(e => e.type === state.filter);
+  if(state.q) rows = rows.filter(e => (e.title||'').toLowerCase().includes(state.q));
+  if(state.sort === 'recent')  rows.sort((a,b) => (b.watched_on||'').localeCompare(a.watched_on||''));
+  if(state.sort === 'oldest')  rows.sort((a,b) => (a.watched_on||'').localeCompare(b.watched_on||''));
+  if(state.sort === 'rating')  rows.sort((a,b) => (b.rating||0) - (a.rating||0) || (a.title||'').localeCompare(b.title||''));
+  if(state.sort === 'title')   rows.sort((a,b) => (a.title||'').localeCompare(b.title||''));
+  return rows;
+}
+function renderAll(){
+  const el = $('#stats');
+  const n = state.entries.length;
+  const movies = state.entries.filter(e => e.type==='movie').length;
+  const series = state.entries.filter(e => e.type==='series').length;
+  const rated = state.entries.filter(e => e.rating);
+  const avg = rated.length ? (rated.reduce((s,e)=>s+e.rating,0)/rated.length).toFixed(1) : '–';
+  el.innerHTML =
+    '<div class="stat"><div class="n">'+n+'</div><div class="l">Titles watched</div></div>' +
+    '<div class="stat"><div class="n">'+movies+'</div><div class="l">Movies</div></div>' +
+    '<div class="stat"><div class="n">'+series+'</div><div class="l">TV shows</div></div>' +
+    '<div class="stat"><div class="n">'+avg+'<span style="font-size:14px;color:var(--faint)">★</span></div><div class="l">Avg rating</div></div>';
+  $('#tab-all .cnt').textContent = n ? '('+n+')' : '';
+  $('#tab-movie .cnt').textContent = movies ? '('+movies+')' : '';
+  $('#tab-series .cnt').textContent = series ? '('+series+')' : '';
+  const rows = visibleEntries();
+  const grid = $('#grid');
+  grid.innerHTML = rows.map(cardHTML).join('');
+  $('#empty').style.display = n ? 'none' : 'block';
+  grid.style.display = n ? 'grid' : 'none';
+  updateModeChip();
+}
+function cardHTML(e){
+  const stars = e.rating ? '<div class="card-stars">'+starsHTML(e.rating)+'</div>' : '<div class="card-stars" style="color:var(--faint);font-size:10.5px">not rated</div>';
+  const comment = e.comment ? '<div class="card-comment">"'+esc(e.comment)+'"</div>' : '';
+  return '' +
+  '<div class="card" data-action="open" data-id="'+esc(e.id)+'">' +
+    '<div class="poster-box"><img class="poster" loading="lazy" src="'+esc(e.poster||'')+'" alt=""></div>' +
+    '<div class="card-body">' +
+      '<div class="card-title">'+esc(e.title)+'</div>' +
+      '<div class="card-meta"><span class="badge '+(e.type==='series'?'series':'movie')+'">'+(e.type==='series'?'TV':'Movie')+'</span><span>'+esc(e.year||'')+'</span></div>' +
+      stars +
+      comment +
+      '<div class="card-date">Watched '+fmtDate(e.watched_on)+'</div>' +
+    '</div>' +
+  '</div>';
+}
+function updateModeChip(){
+  const chip = $('#mode-chip');
+  const lg = $('#logout-btn');
+  if(state.mode === 'cloud' && state.session){
+    chip.innerHTML = '☁️ synced <b>'+esc(state.session.email)+'</b>';
+    lg.style.display = '';
+  } else {
+    chip.innerHTML = '💾 local mode';
+    lg.style.display = 'none';
+  }
+}
+
+/* ---------------- add flow ---------------- */
+function openAddModal(){
+  $('#add-q').value = '';
+  $('#add-results').innerHTML = '';
+  showAddView('search');
+  openModal('add-modal');
+  setTimeout(()=>$('#add-q').focus(), 60);
+}
+function showAddView(v){
+  $('#add-view-search').style.display = v==='search' ? '' : 'none';
+  $('#add-view-form').style.display = v==='form' ? '' : 'none';
+  $('#add-head').textContent = v==='search' ? 'Add what you watched' : 'Add what you watched';
+}
+async function doSearch(){
+  const q = $('#add-q').value.trim();
+  if(!q) return;
+  const box = $('#add-results');
+  box.innerHTML = '<div class="ep-loading"><span class="spinner"></span> Searching…</div>';
+  try{
+    const res = await omdbSearch(q);
+    if(!res.length){ box.innerHTML = '<p class="res-note">No results — check the spelling or try adding it manually.</p>'; return; }
+    box.innerHTML = res.map(r =>
+      '<button class="res-card" data-action="pick" data-id="'+esc(r.imdbID)+'">' +
+        '<div class="poster-box"><img class="poster" loading="lazy" src="'+esc(r.Poster&&r.Poster!=='N/A'?r.Poster:'')+'" alt=""></div>' +
+        '<div class="r-body"><div class="r-title">'+esc(r.Title)+'</div>' +
+        '<div class="r-meta">'+esc(r.Year)+' · '+(r.Type==='series'?'TV series':'Movie')+'</div></div>' +
+      '</button>').join('');
+  }catch(e){
+    box.innerHTML = '<p class="res-note">'+esc(e.message)+'</p>';
+  }
+}
+async function pickResult(imdbID){
+  const body = $('#add-form-body');
+  showAddView('form');
+  body.innerHTML = '<div class="ep-loading"><span class="spinner"></span> Loading details…</div>';
+  let omdb = null, tvmazeId = null;
+  try{ omdb = await omdbDetail(imdbID, 'full'); }catch(e){ toast('OMDB detail failed: '+e.message, 'err'); }
+  if(omdb && omdb.Type === 'series' && settings.useTvmaze){
+    const t = await tvmazeResolve(omdb.imdbID, omdb.Title, omdb.Year);
+    if(t) tvmazeId = t.id;
+  }
+  state.add = { omdb, tvmazeId, rating: 0, comment: '', watchedOn: todayStr() };
+  body.innerHTML = addFormHTML(state.add);
+  makeStars($('#add-stars'), 0, v => { state.add.rating = v; });
+  $('#add-comment').value = '';
+  $('#add-watched').value = todayStr();
+  $('#add-comment').addEventListener('input', e => state.add.comment = e.target.value);
+  $('#add-watched').addEventListener('change', e => state.add.watchedOn = e.target.value);
+}
+function addFormHTML(a){
+  const o = a.omdb || {};
+  const poster = o.Poster && o.Poster!=='N/A' ? o.Poster : '';
+  const type = (o.Type||'movie') === 'series' ? 'series' : 'movie';
+  const chips = [
+    o.Runtime && o.Runtime!=='N/A' ? o.Runtime : null,
+    o.Genre && o.Genre!=='N/A' ? o.Genre : null,
+    o.Released && o.Released!=='N/A' ? o.Released : null,
+    o.totalSeasons ? o.totalSeasons+' seasons' : null
+  ].filter(Boolean);
+  return '' +
+  '<div class="detail-grid">' +
+    '<div class="poster-box"><img class="poster" src="'+esc(poster)+'" alt=""></div>' +
+    '<div>' +
+      '<div class="dm-title">'+esc(o.Title||'')+' <span class="dm-year">('+esc(o.Year||'')+')</span></div>' +
+      '<div class="dm-meta">' + chips.map(c=>'<span class="chip2">'+esc(c)+'</span>').join('') + '</div>' +
+      (o.Plot && o.Plot!=='N/A' ? '<p class="plot" style="font-size:13px;line-height:1.6;color:#b9c0cb">'+esc(o.Plot)+'</p>' : '') +
+    '</div>' +
+  '</div>' +
+  '<div class="sec"><h3>Your rating</h3><div id="add-stars"></div></div>' +
+  '<div class="sec"><h3>Your comment <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></h3>' +
+    '<textarea class="comment-input" id="add-comment" placeholder="What did you think?"></textarea></div>' +
+  '<div class="sec"><h3>When did you watch it?</h3><input type="date" id="add-watched" class="text-input" style="width:auto" value="'+esc(a.watchedOn)+'"></div>' +
+  '<div class="modal-foot">' +
+    '<button class="btn btn-ghost" data-action="back-to-search">Cancel</button>' +
+    '<button class="btn btn-gold" data-action="save-add">Save to my watchlist</button>' +
+  '</div>';
+}
+async function saveAdd(){
+  const a = state.add;
+  if(!a) return;
+  const o = a.omdb || {};
+  const type = (o.Type||'movie') === 'series' ? 'series' : 'movie';
+  const row = {
+    id: uid(),
+    imdb_id: o.imdbID || null,
+    tvmaze_id: a.tvmazeId || null,
+    title: o.Title || 'Untitled',
+    year: o.Year || '',
+    type,
+    poster: (o.Poster && o.Poster!=='N/A') ? o.Poster : null,
+    plot: (o.Plot && o.Plot!=='N/A') ? o.Plot : '',
+    runtime: (o.Runtime && o.Runtime!=='N/A') ? o.Runtime : '',
+    genre: (o.Genre && o.Genre!=='N/A') ? o.Genre : '',
+    director: (o.Director && o.Director!=='N/A') ? o.Director : '',
+    actors: (o.Actors && o.Actors!=='N/A') ? o.Actors : '',
+    imdb_rating: (o.imdbRating && o.imdbRating!=='N/A') ? o.imdbRating : '',
+    rating: a.rating || null,
+    comment: a.comment || '',
+    watched_on: a.watchedOn || todayStr(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  const btn = $('[data-action="save-add"]');
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving…'; }
+  try{
+    await addEntry(row);
+    closeModal('add-modal');
+    renderAll();
+    toast('Added “'+row.title+'” to your watchlist 🎉', 'ok');
+  }catch(e){
+    toast('Could not save: '+e.message, 'err');
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Save to my watchlist'; }
+  }
+}
+function showManualForm(){
+  showAddView('form');
+  $('#add-form-body').innerHTML =
+    '<div class="sec"><h3>Title</h3><input class="text-input" id="man-title" placeholder="Title" style="margin-top:6px"></div>' +
+    '<div class="sec"><h3>Year</h3><input class="text-input" id="man-year" placeholder="e.g. 1999" style="margin-top:6px;width:140px"></div>' +
+    '<div class="sec"><h3>Type</h3><select class="text-input" id="man-type" style="margin-top:6px"><option value="movie">Movie</option><option value="series">TV series</option></select></div>' +
+    '<div class="sec"><h3>Poster URL (optional)</h3><input class="text-input" id="man-poster" placeholder="https://…" style="margin-top:6px"></div>' +
+    '<div class="modal-foot">' +
+      '<button class="btn btn-ghost" data-action="back-to-search">Cancel</button>' +
+      '<button class="btn btn-gold" data-action="manual-save">Save</button>' +
+    '</div>';
+}
+async function saveManual(){
+  const title = $('#man-title').value.trim();
+  if(!title) return toast('Give it a title first.', 'err');
+  const row = {
+    id: uid(),
+    imdb_id: null, tvmaze_id: null,
+    title, year: $('#man-year').value.trim(),
+    type: $('#man-type').value,
+    poster: $('#man-poster').value.trim() || null,
+    plot: '', runtime: '', genre: '', director: '', actors: '', imdb_rating: '',
+    rating: null, comment: '',
+    watched_on: todayStr(),
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+  };
+  try{
+    await addEntry(row);
+    closeModal('add-modal');
+    renderAll();
+    toast('Added “'+title+'” 🎉', 'ok');
+  }catch(e){ toast('Could not save: '+e.message, 'err'); }
+}
+
+/* ---------------- detail modal ---------------- */
+async function openDetail(id){
+  const entry = state.entries.find(e => e.id === id);
+  if(!entry) return;
+  state.detail = { entry, omdb: null, episodes: null, season: 1, expanded: new Set() };
+  openModal('detail-modal');
+  const panel = $('#detail-panel');
+  panel.innerHTML = '<div class="ep-loading" style="text-align:center;padding:40px"><span class="spinner"></span> Loading…</div>';
+  renderDetailShell(entry);
+  const f = [];
+  if(entry.imdb_id){
+    f.push(omdbDetail(entry.imdb_id, 'full').then(d => { state.detail.omdb = d; }).catch(()=>{}));
+  }
+  if(entry.type === 'series' && settings.useTvmaze){
+    f.push(loadEpisodesFor(entry));
+  }
+  await Promise.all(f);
+  renderDetailShell(entry);
+  if(state.detail.episodes && state.detail.episodes.length){
+    state.detail.season = Math.min(state.detail.season, maxSeason(state.detail.episodes));
+    renderEpisodes();
+  } else if(entry.type === 'series'){
+    renderEpisodes(); // shows fallback message
+  }
+}
+async function loadEpisodesFor(entry){
+  try{
+    let showId = entry.tvmaze_id;
+    if(!showId && entry.imdb_id){
+      const t = await tvmazeResolve(entry.imdb_id, entry.title, entry.year);
+      if(t) showId = t.id;
+    }
+    if(!showId){ state.detail.episodes = []; return; }
+    state.detail.episodes = await tvmazeEpisodes(showId);
+  }catch(e){
+    console.warn(e);
+    state.detail.episodes = [];
+  }
+}
+function maxSeason(eps){
+  return eps.reduce((m,e)=>Math.max(m, e.season||0), 0);
+}
+function renderDetailShell(entry){
+  const d = state.detail;
+  const o = d.omdb || {};
+  const poster = (o.Poster && o.Poster!=='N/A') ? o.Poster : (entry.poster||'');
+  const chips = [];
+  if(o.Runtime && o.Runtime!=='N/A') chips.push(['Runtime', o.Runtime]);
+  if(o.Rated && o.Rated!=='N/A') chips.push(['Rated', o.Rated]);
+  if(o.Released && o.Released!=='N/A') chips.push(['Released', o.Released]);
+  if(o.Genre && o.Genre!=='N/A') chips.push(['Genre', o.Genre]);
+  if(o.totalSeasons) chips.push(['Seasons', o.totalSeasons]);
+  const ratings = (o.Ratings||[]).filter(r => r.Value && r.Value!=='N/A').map(r => '<span class="rating-tag"><span class="src">'+esc(r.Source)+'</span><span class="val">'+esc(r.Value)+'</span></span>');
+  const plot = (o.Plot && o.Plot!=='N/A') ? o.Plot : (entry.plot || 'No synopsis available for this title.');
+  const director = (o.Director && o.Director!=='N/A') ? o.Director : (entry.director||'—');
+  const writer = (o.Writer && o.Writer!=='N/A') ? o.Writer : '—';
+  const actors = (o.Actors && o.Actors!=='N/A') ? o.Actors : (entry.actors||'—');
+  const isSeries = entry.type === 'series';
+  const episodesHTML = isSeries
+    ? '<div class="sec"><h3>Episodes</h3><div id="episodes-area"><div class="ep-loading"><span class="spinner"></span> Loading episodes…</div></div></div>'
+    : '';
+  const panelEl = $('#detail-panel');
+  panelEl.innerHTML = '' +
+  '<div class="modal-head">' +
+    '<h2 style="font-size:16px;color:var(--muted);font-weight:600">'+(isSeries?'📺 TV series':'🎥 Movie')+'</h2>' +
+    '<div style="display:flex;gap:8px">' +
+      (entry.imdb_id ? '<a class="btn btn-ghost" style="text-decoration:none;padding:7px 12px;font-size:12.5px" href="https://www.imdb.com/title/'+esc(entry.imdb_id)+'/" target="_blank" rel="noopener">IMDb ↗</a>' : '') +
+      '<button class="modal-x" data-action="close-modal" data-modal="detail-modal" title="Close">✕</button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="detail-grid">' +
+    '<div class="poster-box"><img class="poster" src="'+esc(poster)+'" alt=""></div>' +
+    '<div>' +
+      '<div class="dm-title">'+esc(entry.title)+' <span class="dm-year">('+esc(entry.year||'')+')</span></div>' +
+      '<div class="dm-meta">' + chips.map(c=>'<span class="chip2"><b>'+esc(c[0])+':</b> '+esc(c[1])+'</span>').join('') + '</div>' +
+      '<div class="notes-box">' +
+        '<div class="label">Your notes</div>' +
+        '<div class="notes-row" id="note-stars">' + (entry.rating ? starsHTML(entry.rating,'big') : '<span style="color:var(--faint);font-size:13px">Not rated yet</span>') + '</div>' +
+        '<div style="margin-top:8px" class="note-comment">' + (entry.comment ? esc(entry.comment) : '<span style="color:var(--faint);font-size:12.5px">No comment.</span>') + '</div>' +
+        '<div style="margin-top:8px;font-size:12px;color:var(--faint)">Watched on <b style="color:var(--muted)">'+fmtDate(entry.watched_on)+'</b></div>' +
+        '<div style="margin-top:12px;display:flex;gap:8px">' +
+          '<button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" data-action="edit">✏️ Edit</button>' +
+          '<button class="btn btn-danger" style="padding:6px 12px;font-size:12px" data-action="delete">Remove</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="sec"><h3>Synopsis</h3><p class="plot">'+esc(plot)+'</p></div>' +
+  '<div class="sec"><h3>Cast &amp; crew</h3><div class="crew">' +
+    '<div class="row"><span class="k">Director</span><span class="v">'+esc(director)+'</span></div>' +
+    '<div class="row"><span class="k">Writer</span><span class="v">'+esc(writer)+'</span></div>' +
+    '<div class="row"><span class="k">Cast</span><span class="v">'+esc(actors)+'</span></div>' +
+  '</div></div>' +
+  (ratings.length ? '<div class="sec"><h3>Critic scores</h3><div class="ratings">'+ratings.join('')+'</div></div>' : '') +
+  episodesHTML;
+}
+function renderEpisodes(){
+  const d = state.detail;
+  const area = $('#episodes-area');
+  if(!area) return;
+  const eps = d.episodes || [];
+  if(!eps.length){
+    area.innerHTML = '<div class="ep-loading">Episode synopses aren’t available for this title' + (settings.useTvmaze ? ' on TVmaze' : ' (TVmaze is turned off in settings)') + '. If it’s a new/obscure show, you can still track it here without episode details.</div>';
+    return;
+  }
+  const seasons = [...new Set(eps.map(e=>e.season||0))].sort((a,b)=>a-b);
+  if(d.season === undefined || !seasons.includes(d.season)) d.season = seasons[0];
+  const pills = seasons.map(s =>
+    '<button class="s-pill'+(s===d.season?' on':'')+'" data-action="season" data-season="'+s+'">'+(s===0?'Specials':'Season '+s)+'</button>').join('');
+  const rows = eps.filter(e => (e.season||0) === d.season).sort((a,b)=>(a.number||99)-(b.number||99)).map(ep => {
+    const syn = stripHtml(ep.summary);
+    const isOpen = d.expanded.has(ep.id);
+    const meta = [];
+    if(ep.airdate) meta.push(fmtDate(ep.airdate));
+    if(ep.runtime) meta.push(ep.runtime+' min');
+    if(ep.rating && ep.rating.average) meta.push('★ '+ep.rating.average.toFixed(1));
+    return '' +
+    '<div class="ep-row'+(isOpen?' open':'')+'">' +
+      '<button class="ep-head" data-action="ep" data-ep="'+ep.id+'">' +
+        '<span class="ep-num">'+(ep.number!=null ? 'E'+String(ep.number).padStart(2,'0') : 'SPECIAL')+'</span>' +
+        '<span class="ep-name">'+esc(ep.name||'Episode')+'</span>' +
+        '<span class="ep-meta">'+meta.join('<span>·</span>')+'</span>' +
+        '<span class="ep-chev">▼</span>' +
+      '</button>' +
+      '<div class="ep-body">'+(syn ? esc(syn) : '<span style="color:var(--faint)">No synopsis available for this episode.</span>')+'</div>' +
+    '</div>';
+  }).join('');
+  area.innerHTML = '<div class="season-pills">'+pills+'</div><div class="ep-list">'+rows+'</div>';
+}
+function enterEditMode(){
+  const d = state.detail;
+  if(!d) return;
+  const box = $('.notes-box');
+  if(!box) return;
+  box.innerHTML = '' +
+  '<div class="label">Your rating</div>' +
+  '<div class="notes-row" id="edit-stars"></div>' +
+  '<div class="label" style="margin-top:14px">Your comment</div>' +
+  '<textarea class="comment-input" id="edit-comment">'+esc(d.entry.comment||'')+'</textarea>' +
+  '<div class="label" style="margin-top:14px">Watched on</div>' +
+  '<input type="date" id="edit-watched" class="text-input" style="width:auto" value="'+esc(d.entry.watched_on||todayStr())+'">' +
+  '<div style="margin-top:14px;display:flex;gap:8px">' +
+    '<button class="btn btn-gold" style="padding:6px 14px;font-size:12.5px" data-action="save-edit">Save changes</button>' +
+    '<button class="btn btn-ghost" style="padding:6px 14px;font-size:12.5px" data-action="cancel-edit">Cancel</button>' +
+  '</div>';
+  makeStars($('#edit-stars'), d.entry.rating||0, v => d.editRating = v);
+  d.editRating = d.entry.rating||0;
+}
+async function saveEdit(){
+  const d = state.detail;
+  if(!d) return;
+  const patch = {
+    rating: d.editRating||null,
+    comment: $('#edit-comment').value.trim(),
+    watched_on: $('#edit-watched').value || todayStr()
+  };
+  try{
+    const updated = await updateEntry(d.entry.id, patch);
+    d.entry = updated;
+    renderAll();
+    renderDetailShell(updated);
+    toast('Changes saved ✓', 'ok');
+  }catch(e){ toast('Could not save: '+e.message, 'err'); }
+}
+function askDelete(entry){
+  state.confirm = {
+    title: 'Remove this title?',
+    text: '“'+entry.title+'” will be removed from your watchlist' + (state.mode==='cloud' ? ' (including the cloud backup).' : '.'),
+    yesLabel: 'Remove',
+    onYes: async () => {
+      try{
+        await deleteEntry(entry.id);
+        closeModal('confirm-modal');
+        closeModal('detail-modal');
+        renderAll();
+        toast('Removed “'+entry.title+'”.', '');
+      }catch(e){ toast('Could not remove: '+e.message, 'err'); }
+    }
+  };
+  $('#confirm-title').textContent = state.confirm.title;
+  $('#confirm-text').textContent = state.confirm.text;
+  $('#confirm-yes').textContent = state.confirm.yesLabel;
+  openModal('confirm-modal');
+}
+
+/* ---------------- settings ---------------- */
+function openSettings(){
+  $('#set-url').value = settings.supabaseUrl;
+  $('#set-anon').value = settings.supabaseAnonKey;
+  $('#set-omdb').value = settings.omdbApiKey;
+  $('#set-tvmaze').checked = !!settings.useTvmaze;
+  $('#settings-note').textContent = state.mode==='cloud'
+    ? 'Cloud mode is active. Changes take effect after reload.'
+    : 'Local mode is active — your entries currently live only in this browser. Add your Supabase details to sync across devices.';
+  openModal('settings-modal');
+}
+function saveSettings(){
+  settings.supabaseUrl = $('#set-url').value.trim().replace(/\/+$/,'');
+  settings.supabaseAnonKey = $('#set-anon').value.trim();
+  settings.omdbApiKey = $('#set-omdb').value.trim() || DEFAULT_CONFIG.omdbApiKey;
+  settings.useTvmaze = $('#set-tvmaze').checked;
+  lsSet(LS.settings, settings);
+  toast('Settings saved — reloading…', 'ok');
+  setTimeout(()=>location.reload(), 600);
+}
+
+/* ---------------- modal plumbing ---------------- */
+function openModal(id){ $('#'+id).classList.add('open'); }
+function closeModal(id){ $('#'+id).classList.remove('open'); }
+function closeTopModal(){
+  const open = $$('.modal.open');
+  if(open.length) closeModal(open[open.length-1].id);
+}
+
+/* ---------------- global click delegation ---------------- */
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const a = el.dataset.action;
+  switch(a){
+    case 'open': openDetail(el.dataset.id); break;
+    case 'close-modal': closeModal(el.dataset.modal); break;
+    case 'open-add': openAddModal(); break;
+    case 'do-search': doSearch(); break;
+    case 'pick': pickResult(el.dataset.id); break;
+    case 'back-to-search': showAddView('search'); $('#add-q').focus(); break;
+    case 'save-add': saveAdd(); break;
+    case 'manual-add': showManualForm(); break;
+    case 'manual-save': saveManual(); break;
+    case 'edit': enterEditMode(); break;
+    case 'save-edit': saveEdit(); break;
+    case 'cancel-edit': renderDetailShell(state.detail ? state.detail.entry : null); if(state.detail && state.detail.episodes) renderEpisodes(); break;
+    case 'delete': if(state.detail) askDelete(state.detail.entry); break;
+    case 'season':
+      state.detail.season = parseInt(el.dataset.season,10);
+      renderEpisodes();
+      break;
+    case 'ep': {
+      const id = Number(el.dataset.ep);
+      if(state.detail.expanded.has(id)) state.detail.expanded.delete(id); else state.detail.expanded.add(id);
+      renderEpisodes();
+      break;
+    }
+    case 'tab':
+      $$('#tabs .tab').forEach(t=>t.classList.toggle('on', t===el));
+      state.filter = el.dataset.filter;
+      renderAll();
+      break;
+    case 'open-settings': openSettings(); break;
+    case 'settings-save': saveSettings(); break;
+    case 'login-mode': setLoginMode(el.dataset.mode); break;
+    case 'login-submit': doLogin(); break;
+    case 'forgot': doForgot(); break;
+    case 'go-local': goLocal(); break;
+    case 'logout':
+      try{ await AUTH.logout(); }catch(e){}
+      clearSession();
+      state.mode = 'cloud';
+      showLogin('Signed out.');
+      break;
+    case 'confirm-yes': if(state.confirm && state.confirm.onYes) state.confirm.onYes(); break;
+    case 'confirm-no': closeModal('confirm-modal'); break;
+  }
+});
+
+/* ---------------- other bindings ---------------- */
+function bindStatic(){
+  $('#add-q').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+  $('#list-search').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); renderAll(); });
+  $('#sort-select').addEventListener('change', e => { state.sort = e.target.value; renderAll(); });
+  $('#login-email').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  $('#login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') closeTopModal();
+    if(e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
+      e.preventDefault(); $('#add-q').focus();
+    }
+  });
+  $$('.modal').forEach(m => m.addEventListener('mousedown', e => {
+    if(e.target === m) closeModal(m.id);
+  }));
+  /* poster load failure → placeholder */
+  document.addEventListener('error', e => {
+    const t = e.target;
+    if(t.tagName === 'IMG' && t.classList.contains('poster') && !t.dataset.fb){
+      t.dataset.fb = '1';
+      const box = t.closest('.poster-box');
+      if(box) box.classList.add('noposter');
+      t.remove();
+    }
+  }, true);
+  document.addEventListener('input', e => {
+    if(e.target.id === 'add-comment' && state.add) state.add.comment = e.target.value;
+    if(e.target.id === 'add-watched' && state.add) state.add.watchedOn = e.target.value;
+  });
+}
+
+/* ---------------- boot ---------------- */
+async function init(){
+  bindStatic();
+  const hasCloud = !!(settings.supabaseUrl && settings.supabaseAnonKey);
+  state.mode = hasCloud ? 'cloud' : 'local';
+  if(state.mode === 'cloud'){
+    const ok = await ensureSession();
+    if(ok){
+      try{
+        await loadEntries();
+        showApp();
+        renderAll();
+        return;
+      }catch(e){
+        console.error(e);
+        showLogin('Could not load your watchlist: '+e.message);
+        return;
+      }
+    }
+    showLogin();
+  } else {
+    loadEntries().then(()=>{ showApp(); renderAll(); });
+  }
+}
+init();
+</script>
+</body>
+</html>
