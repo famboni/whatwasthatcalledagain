@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<!-- WWTCAA v1.4.0 — mobile UI (bottom sheets, FAB, touch targets) + RLS write fix.
+     Verify deployed version: view page source and search for "v1.4.0" or "WRITE TEST". -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <title>What Was That Called Again? — My Watchlist</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
@@ -336,6 +338,130 @@ details.setup pre{
 
 .spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(242,193,78,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* floating add button (mobile only) */
+.fab{display:none}
+
+/* ================================================================
+   MOBILE / SMALL SCREEN (≤ 760px)
+   ================================================================ */
+@media (max-width: 760px){
+  html{-webkit-text-size-adjust:100%}
+  body{-webkit-tap-highlight-color:transparent}
+  /* 16px minimum on form fields stops iOS auto-zoom when focusing */
+  input,select,textarea{font-size:16px !important}
+  .btn,.tab,.icon-btn,.s-pill,.ep-head,.linklike,.fab,.modal-x,.res-card,.check-row{touch-action:manipulation}
+
+  /* header */
+  header{padding:calc(8px + env(safe-area-inset-top)) 14px 8px;gap:8px}
+  .brand .reel{width:34px;height:34px;font-size:17px;border-radius:10px}
+  .brand h1{font-size:16px}
+  .brand small{display:none}
+  .chip{display:none}
+  #logout-btn{display:none !important} /* sign out lives in ⚙ Settings on mobile */
+  .icon-btn{width:42px;height:42px;border-radius:11px;font-size:17px}
+
+  main{padding:18px 14px calc(96px + env(safe-area-inset-bottom))}
+
+  /* stats 2×2 */
+  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat{padding:12px 14px}
+  .stat .n{font-size:22px}
+  .stat .l{font-size:10.5px}
+
+  /* toolbar: search full width, tabs scrollable, sort full width, add via FAB */
+  .toolbar{display:grid;grid-template-columns:1fr;gap:10px}
+  .search-box{grid-column:1/-1}
+  .search-box input{min-height:46px;padding:12px 12px 12px 40px;font-size:16px}
+  .tabs{grid-column:1/-1;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;justify-content:flex-start}
+  .tab{flex:none;min-height:42px;padding:8px 15px;font-size:14px}
+  #sort-select{width:100%;min-height:46px}
+  .toolbar .btn-gold{display:none} /* replaced by the floating ＋ button */
+
+  /* cards: comfortable 2-column grid */
+  .grid{grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr));gap:12px}
+  .card-title{font-size:15px}
+  .card-meta{font-size:12px}
+  .card-stars{font-size:13px}
+  .card-comment{font-size:12.5px}
+  .card-date{font-size:11px}
+
+  /* floating add button */
+  .fab{
+    display:flex;position:fixed;right:16px;
+    bottom:calc(18px + env(safe-area-inset-bottom));z-index:70;
+    width:58px;height:58px;border-radius:50%;
+    align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#f2c14e,#e3a637);color:#201503;
+    font-size:28px;font-weight:700;border:none;cursor:pointer;
+    box-shadow:0 10px 28px rgba(242,193,78,.38);
+    transition:transform .15s ease;
+  }
+  .fab:active{transform:scale(.9)}
+
+  /* modals become bottom sheets */
+  .modal{padding:0;align-items:flex-end}
+  .modal-panel{
+    width:100%;max-width:100%;border-radius:20px 20px 0 0;
+    padding:16px;margin:0 auto;background:#12151c;
+    max-height:94vh;max-height:94dvh;overflow-y:auto;
+    animation:sheetup .25s ease;
+  }
+  @keyframes sheetup{from{transform:translateY(34px);opacity:.5}to{transform:none;opacity:1}}
+  .modal-head{
+    position:sticky;top:-16px;z-index:2;
+    margin:-16px -16px 14px;padding:14px 16px 10px;
+    background:#12151c;border-bottom:1px solid var(--line);
+  }
+  .modal-head h2{font-size:17px}
+  .modal-x{width:40px;height:40px}
+  .modal-foot{flex-wrap:wrap;gap:10px}
+  .modal-foot .btn{flex:1 1 45%;justify-content:center;min-height:46px}
+  #confirm-modal .modal-foot .btn{flex:1 1 auto}
+
+  /* detail / add form */
+  .detail-grid{gap:16px}
+  .detail-grid .poster-box{max-width:150px;width:100%;margin:0 auto}
+  .dm-title{font-size:21px;line-height:1.25;text-align:center}
+  .dm-year{display:block;margin-top:2px}
+  .dm-meta{justify-content:center}
+  .chip2{font-size:11.5px}
+  .sec h3{font-size:12px;letter-spacing:1.1px}
+  .sec p.plot{font-size:14.5px;line-height:1.7}
+  .crew{font-size:14px}
+  .crew .row .k{width:64px}
+  .note-comment{font-size:14.5px}
+  .rating-tag{font-size:13px}
+
+  /* episodes */
+  .season-pills{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+  .s-pill{flex:none;min-height:40px}
+  .ep-head{min-height:52px;padding:10px 12px;gap:8px;flex-wrap:wrap}
+  .ep-name{font-size:14px}
+  .ep-meta{flex-basis:100%;margin-left:2px;font-size:11.5px;gap:8px}
+  .ep-body{padding:0 12px 12px;font-size:13.5px;line-height:1.65}
+
+  /* add modal */
+  #add-search{flex-direction:column;gap:10px}
+  #add-search .btn{min-height:48px;justify-content:center}
+  .results{grid-template-columns:repeat(2,1fr);gap:10px;max-height:none}
+  .r-title{font-size:12.5px}
+  .rate-wrap .star{font-size:34px}
+
+  /* toasts at the top so they don't cover the FAB */
+  #toasts{left:12px;right:12px;top:calc(12px + env(safe-area-inset-top));bottom:auto;max-width:none}
+  .toast{font-size:14px;padding:13px 15px}
+
+  /* login & settings */
+  #login-screen{overflow-y:auto;padding:calc(24px + env(safe-area-inset-top)) 16px 24px;align-items:flex-start}
+  .login-card{max-width:100%}
+  .login-body{padding:16px;gap:10px}
+  .login-body input{min-height:48px}
+  .login-body .btn{min-height:48px}
+  .set-field input[type=text],.set-field input[type=password]{min-height:44px;font-size:15px}
+  textarea.comment-input{font-size:15px}
+  details.setup pre{font-size:10.5px}
+}
 </style>
 </head>
 <body>
@@ -463,6 +589,9 @@ details.setup pre{
       <button class="btn btn-ghost" data-action="run-diagnostics">🔍 Run connection diagnostics</button>
       <pre id="diag-output" style="display:none;margin-top:10px;background:#0a0d11;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:11.5px;line-height:1.55;white-space:pre-wrap;color:#9fd0a8;max-height:260px;overflow-y:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"></pre>
     </div>
+    <div style="margin-top:14px;display:none" id="settings-logout-wrap">
+      <button class="btn btn-danger" data-action="logout-settings" style="width:100%;justify-content:center">Sign out of cloud account</button>
+    </div>
     <details class="setup">
       <summary>First time here? Supabase setup steps</summary>
       <pre>1. Create a free project at https://supabase.com
@@ -551,6 +680,9 @@ end-to-end, and it checks whether Supabase Auth still accepts your token.
 </div>
 
 <div id="toasts"></div>
+
+<!-- floating add button (mobile) -->
+<button class="fab" data-action="open-add" aria-label="Add a title">＋</button>
 
 <script>
 'use strict';
@@ -1404,6 +1536,7 @@ function openSettings(){
   $('#set-anon').value = settings.supabaseAnonKey;
   $('#set-omdb').value = settings.omdbApiKey;
   $('#set-tvmaze').checked = !!settings.useTvmaze;
+  $('#settings-logout-wrap').style.display = (state.mode==='cloud' && state.session) ? '' : 'none';
   $('#settings-note').textContent = state.mode==='cloud'
     ? 'Cloud mode is active. Changes take effect after reload.'
     : 'Local mode is active — your entries currently live only in this browser. Add your Supabase details to sync across devices.';
@@ -1586,6 +1719,8 @@ document.addEventListener('click', async e => {
     case 'forgot': doForgot(); break;
     case 'go-local': goLocal(); break;
     case 'logout':
+    case 'logout-settings':
+      closeModal('settings-modal');
       try{ await AUTH.logout(); }catch(e){}
       clearSession();
       state.mode = 'cloud';
@@ -1654,6 +1789,5 @@ async function init(){
 }
 init();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a33efb257c7d0f0d',t:'MTc4ODIxMDE5Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a33f08450e44ae2b',t:'MTc4ODIxMDczNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

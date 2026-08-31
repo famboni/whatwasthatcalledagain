@@ -90,6 +90,9 @@ details rather than breaking.
 - **Works before you configure anything** — localStorage fallback means you can
   start tracking immediately, then enable cloud sync later (existing local
   entries stay in that browser).
+- **Mobile-friendly** — works great on phones: floating ＋ button, bottom-sheet
+  dialogs, thumb-friendly touch targets, no iOS zoom-on-focus, safe-area support
+  for notched screens. Desktop layout is unchanged.
 - **Keyboard friendly** — `/` focuses search, `Esc` closes dialogs.
 
 ---
