@@ -459,11 +459,16 @@ details.setup pre{
     <label class="check-row">
       <input type="checkbox" id="set-tvmaze"> Fetch episode synopses from TVmaze (free, no key)
     </label>
+    <div style="margin-top:16px">
+      <button class="btn btn-ghost" data-action="run-diagnostics">🔍 Run connection diagnostics</button>
+      <pre id="diag-output" style="display:none;margin-top:10px;background:#0a0d11;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:11.5px;line-height:1.55;white-space:pre-wrap;color:#9fd0a8;max-height:260px;overflow-y:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"></pre>
+    </div>
     <details class="setup">
       <summary>First time here? Supabase setup steps</summary>
       <pre>1. Create a free project at https://supabase.com
 2. In the left sidebar open the SQL Editor
-3. Paste and run this whole script (also in supabase.sql):
+3. Paste and run this whole script (also in supabase.sql — safe to re-run,
+   it cleans up before creating):
 
 create table if not exists public.watched (
   id uuid primary key default gen_random_uuid(),
@@ -487,11 +492,40 @@ create table if not exists public.watched (
   updated_at timestamptz not null default now()
 );
 alter table public.watched enable row level security;
+drop policy if exists "own select" on public.watched;
 create policy "own select" on public.watched for select to authenticated using (auth.uid() = user_id);
+drop policy if exists "own insert" on public.watched;
 create policy "own insert" on public.watched for insert to authenticated with check (auth.uid() = user_id);
+drop policy if exists "own update" on public.watched;
 create policy "own update" on public.watched for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "own delete" on public.watched;
 create policy "own delete" on public.watched for delete to authenticated using (auth.uid() = user_id);
 create index if not exists watched_user_idx on public.watched(user_id, watched_on desc);
+
+TROUBLESHOOTING — if saves are blocked by row-level security, run this
+diagnostic (it does not change any data):
+
+select
+  (select count(*) from pg_policies where schemaname='public' and tablename='watched') as policy_count,
+  (select bool_or(policyname='own select') from pg_policies where schemaname='public' and tablename='watched') as has_select,
+  (select bool_or(policyname='own insert') from pg_policies where schemaname='public' and tablename='watched') as has_insert,
+  (select count(*) from pg_tables where schemaname='public' and tablename='watched') as table_exists;
+
+If has_select or has_insert comes back false → re-run the script above.
+If they come back true but saves still fail → check the policy details:
+
+select policyname, cmd, roles::text, qual, with_check
+from pg_policies
+where schemaname = 'public' and tablename = 'watched'
+order by policyname;
+
+Expected: roles = {authenticated}, qual = (auth.uid() = user_id),
+with_check = (auth.uid() = user_id) for INSERT and UPDATE.
+If roles shows {anon} or the expressions differ, drop the bad policy
+(drop policy if exists "<name>" on public.watched;) and re-run the script.
+Also: in the app, use ⚙ Settings → Run connection diagnostics — its
+WRITE TEST inserts and deletes a temp row to prove the INSERT policy
+end-to-end, and it checks whether Supabase Auth still accepts your token.
 
 4. Project Settings → API: copy the Project URL and anon key
 5. Paste them above and click Save — then sign up with your email.</pre>
@@ -606,11 +640,20 @@ function toast(msg, type){
   setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(), 400); }, 3800);
 }
 
+/* Turn cryptic Postgres RLS errors into actionable guidance */
+function rlsMessage(msg){
+  if(/row-level security|row security|new-row security/i.test(msg||'')){
+    return 'Supabase row-level security blocked the save — the "insert"/"select" policy is missing or the user id doesn\'t match. Re-run supabase.sql (safe to re-run), then use Settings → Run diagnostics.';
+  }
+  return msg;
+}
+
 /* ---------------- Supabase client (REST — no SDK needed) ---------------- */
-async function sbReq(method, path, body, {auth=true, retry=true}={}){
+async function sbReq(method, path, body, {auth=true, retry=true, prefer}={}){
   if(!settings.supabaseUrl || !settings.supabaseAnonKey) throw new Error('Supabase is not configured. Open ⚙ Settings.');
   const url = settings.supabaseUrl.replace(/\/+$/,'') + path;
   const headers = { apikey: settings.supabaseAnonKey, 'Content-Type': 'application/json' };
+  if(prefer) headers.Prefer = prefer;
   if(auth){
     if(!state.session || !state.session.access_token) throw new Error('Not signed in.');
     headers.Authorization = 'Bearer ' + state.session.access_token;
@@ -635,8 +678,9 @@ async function sbReq(method, path, body, {auth=true, retry=true}={}){
     throw new Error(msg);
   }
   if(res.status === 204) return null;
-  const ct = res.headers.get('content-type')||'';
-  return ct.includes('json') ? res.json() : res.text();
+  const raw = await res.text();
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return raw; }
 }
 
 const AUTH = {
@@ -657,9 +701,20 @@ const AUTH = {
   }
 };
 
+/* Decode the JWT "sub" claim — this is exactly what auth.uid() resolves to
+   server-side, so it is the authoritative user id for RLS. */
+function jwtSub(token){
+  try{
+    const p = String(token||'').split('.')[1];
+    if(!p) return '';
+    const j = JSON.parse(atob(p.replace(/-/g,'+').replace(/_/g,'/')));
+    return j.sub || '';
+  }catch(e){ return ''; }
+}
 function saveSession(s){
   if(!s) return;
   state.session = {
+    id: (s.user && s.user.id) || jwtSub(s.access_token) || '',
     access_token: s.access_token,
     refresh_token: s.refresh_token,
     expires_at: Date.now() + (parseInt(s.expires_in,10)||3600)*1000 - 60*1000,
@@ -692,10 +747,13 @@ async function dbList(){
   return sbReq('GET', '/rest/v1/watched?select=*&order=watched_on.desc,created_at.desc');
 }
 async function dbInsert(row){
-  return sbReq('POST', '/rest/v1/watched', row, {auth:true});
+  // return=minimal: PostgREST normally does INSERT ... RETURNING * which also
+  // applies the SELECT policy to the returned row — that can fail writes even
+  // when the INSERT policy is fine. We don't need the echo, so skip it.
+  return sbReq('POST', '/rest/v1/watched', row, {auth:true, prefer:'return=minimal'});
 }
 async function dbUpdate(id, patch){
-  return sbReq('PATCH', '/rest/v1/watched?id=eq.'+encodeURIComponent(id), patch, {auth:true});
+  return sbReq('PATCH', '/rest/v1/watched?id=eq.'+encodeURIComponent(id), patch, {auth:true, prefer:'return=minimal'});
 }
 async function dbDelete(id){
   return sbReq('DELETE', '/rest/v1/watched?id=eq.'+encodeURIComponent(id), null, {auth:true});
@@ -723,8 +781,17 @@ async function addEntry(row){
 }
 async function updateEntry(id, patch){
   if(state.mode==='cloud'){
-    const r = await dbUpdate(id, patch);
-    const updated = r && r[0] ? r[0] : Object.assign({}, state.entries.find(e=>e.id===id), patch);
+    try{
+      await dbUpdate(id, patch);
+    }catch(e){
+      if(/row-level security|row security/i.test(e.message||'')){
+        await refreshSession();
+        await dbUpdate(id, patch);
+      } else {
+        throw e;
+      }
+    }
+    const updated = Object.assign({}, state.entries.find(e=>e.id===id), patch, {updated_at:new Date().toISOString()});
     state.entries = state.entries.map(e => e.id===id ? updated : e);
     return updated;
   }
@@ -1042,10 +1109,19 @@ function addFormHTML(a){
 async function saveAdd(){
   const a = state.add;
   if(!a) return;
+  if(state.mode === 'cloud'){
+    const ok = await ensureSession();
+    if(!ok || !state.session || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(state.session.id)){
+      closeModal('add-modal');
+      showLogin('Your session has expired — please sign in again, then add the title again.');
+      return;
+    }
+  }
   const o = a.omdb || {};
   const type = (o.Type||'movie') === 'series' ? 'series' : 'movie';
   const row = {
     id: uid(),
+    user_id: (state.mode==='cloud' && state.session) ? state.session.id : null,
     imdb_id: o.imdbID || null,
     tvmaze_id: a.tvmazeId || null,
     title: o.Title || 'Untitled',
@@ -1072,7 +1148,24 @@ async function saveAdd(){
     renderAll();
     toast('Added “'+row.title+'” to your watchlist 🎉', 'ok');
   }catch(e){
-    toast('Could not save: '+e.message, 'err');
+    let msg = e.message;
+    const isRls = /row-level security|row security/i.test(msg);
+    if(isRls && state.mode === 'cloud'){
+      /* Stale session (e.g. the Supabase user was deleted & recreated in the
+         dashboard): refresh the token, re-derive user_id, retry once. */
+      try{
+        const refreshed = await refreshSession();
+        if(refreshed && state.session && state.session.id){
+          row.user_id = state.session.id;
+          await addEntry(row);
+          closeModal('add-modal');
+          renderAll();
+          toast('Added “'+row.title+'” to your watchlist 🎉', 'ok');
+          return;
+        }
+      }catch(e2){}
+    }
+    toast('Could not save: ' + rlsMessage(msg), 'err');
   }finally{
     if(btn){ btn.disabled = false; btn.textContent = 'Save to my watchlist'; }
   }
@@ -1092,8 +1185,17 @@ function showManualForm(){
 async function saveManual(){
   const title = $('#man-title').value.trim();
   if(!title) return toast('Give it a title first.', 'err');
+  if(state.mode === 'cloud'){
+    const ok = await ensureSession();
+    if(!ok || !state.session || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(state.session.id)){
+      closeModal('add-modal');
+      showLogin('Your session has expired — please sign in again, then add the title again.');
+      return;
+    }
+  }
   const row = {
     id: uid(),
+    user_id: (state.mode==='cloud' && state.session) ? state.session.id : null,
     imdb_id: null, tvmaze_id: null,
     title, year: $('#man-year').value.trim(),
     type: $('#man-type').value,
@@ -1108,7 +1210,7 @@ async function saveManual(){
     closeModal('add-modal');
     renderAll();
     toast('Added “'+title+'” 🎉', 'ok');
-  }catch(e){ toast('Could not save: '+e.message, 'err'); }
+  }catch(e){ toast('Could not save: ' + rlsMessage(e.message), 'err'); }
 }
 
 /* ---------------- detail modal ---------------- */
@@ -1317,6 +1419,123 @@ function saveSettings(){
   setTimeout(()=>location.reload(), 600);
 }
 
+/* Run through the full connection chain and report where it breaks.
+   Uses the same REST endpoints as the app, with the user's own anon key. */
+async function runDiagnostics(){
+  const out = $('#diag-output');
+  const btn = $('[data-action="run-diagnostics"]');
+  const log = l => out.textContent += l + '\n';
+  out.style.display = 'block';
+  out.textContent = '';
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = 'Running…';
+  log('WWTCAA diagnostics — ' + new Date().toLocaleString());
+  log('----------------------------------------');
+  try{
+    if(!settings.supabaseUrl || !settings.supabaseAnonKey){
+      log('✗ No Supabase project URL / anon key set. Add them above first.');
+      return;
+    }
+    /* 1. anon key reachability (no auth needed) */
+    try{
+      const r = await fetch(settings.supabaseUrl + '/auth/v1/health', {headers:{apikey:settings.supabaseAnonKey}});
+      log((r.ok ? '✓' : '✗') + ' Supabase reachable (auth health ' + r.status + ')');
+    }catch(e){
+      log('✗ Cannot reach ' + settings.supabaseUrl + ' — check the Project URL.');
+      log('  (' + e.message + ')');
+      return;
+    }
+    const s = state.session;
+    if(!s || !s.access_token){
+      log('— Not signed in yet: sign in/create an account first, then re-run.');
+      return;
+    }
+    /* 2. token validity — Supabase Auth "who am I" */
+    let authEmail = '', authUid = '';
+    try{
+      const ur = await fetch(settings.supabaseUrl + '/auth/v1/user', {headers:{apikey:settings.supabaseAnonKey, Authorization:'Bearer '+s.access_token}});
+      if(ur.ok){
+        const u = await ur.json();
+        authEmail = u.email || ''; authUid = u.id || '';
+        log('✓ Token valid — signed in as ' + (authEmail || '?') + ' (id ' + authUid + ')');
+      } else {
+        log('✗ Supabase Auth rejected your token (HTTP ' + ur.status + ') — your account may have been deleted. Sign out and sign back in.');
+      }
+    }catch(e){
+      log('⚠ Auth check failed: ' + e.message);
+    }
+    /* 3. table existence + SELECT policy */
+    let tableOk = false;
+    try{
+      const r = await fetch(settings.supabaseUrl + '/rest/v1/watched?select=*&limit=0', {headers:{apikey:settings.supabaseAnonKey, Authorization:'Bearer '+s.access_token}});
+      if(r.ok){
+        tableOk = true;
+        log('✓ Table "watched" exists and SELECT policy allows your account (200)');
+      } else if(r.status === 404){
+        log('✗ Table "watched" does not exist (404). Run the SQL script from the setup steps above.');
+      } else {
+        const j = await r.json().catch(()=>({}));
+        log('✗ RLS/policy issue on SELECT (HTTP ' + r.status + '): ' + (j.message||''));
+        log('  → Re-run the SQL script (it is safe to re-run), then sign out & back in.');
+      }
+    }catch(e){
+      log('✗ Request failed: ' + e.message);
+    }
+    /* 4. user id consistency */
+    const sub = jwtSub(s.access_token);
+    log('• user id in your token (sub): ' + (sub || 'none'));
+    log('• user id the app sends rows with: ' + (s.id || 'none'));
+    if(authUid && sub && authUid !== sub) log('⚠ GoTrue and token disagree on your id — sign out and back in.');
+    if(!sub) log('⚠ No sub in token — sign out and back in.');
+    /* 5. WRITE TEST — the definitive check: insert a temp row exactly like the
+          app does, then delete it. Proves the INSERT policy end-to-end. */
+    if(tableOk && s.id){
+      const tid = uid();
+      const probe = {
+        id: tid, user_id: s.id,
+        title: 'WWTCAA diagnostics test', year: '', type: 'movie',
+        poster: null, plot: '', runtime: '', genre: '', director: '',
+        actors: '', imdb_rating: '', rating: null, comment: '',
+        watched_on: todayStr(),
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+      };
+      try{
+        const ir = await fetch(settings.supabaseUrl + '/rest/v1/watched', {
+          method: 'POST',
+          headers: {apikey: settings.supabaseAnonKey, Authorization: 'Bearer '+s.access_token, 'Content-Type': 'application/json', Prefer: 'return=minimal'},
+          body: JSON.stringify(probe)
+        });
+        if(ir.ok){
+          log('✓ WRITE TEST: insert OK — the INSERT policy works for your account');
+          try{
+            const dr = await fetch(settings.supabaseUrl + '/rest/v1/watched?id=eq.' + encodeURIComponent(tid), {
+              method: 'DELETE',
+              headers: {apikey: settings.supabaseAnonKey, Authorization: 'Bearer '+s.access_token, Prefer: 'return=minimal'}
+            });
+            log(dr.ok ? '✓ WRITE TEST: cleanup OK (temp row removed)' : '⚠ Cleanup failed — delete "WWTCAA diagnostics test" from your list manually.');
+          }catch(e){
+            log('⚠ Cleanup failed: ' + e.message + ' — delete "WWTCAA diagnostics test" from your list manually.');
+          }
+        } else {
+          const j = await ir.json().catch(()=>({}));
+          log('✗ WRITE TEST: insert blocked (HTTP ' + ir.status + '): ' + (j.message||''));
+          log('  → Your token/user no longer matches the account the policies expect. Sign out, sign back in, re-run.');
+        }
+      }catch(e){
+        log('✗ WRITE TEST: network error: ' + e.message);
+      }
+    } else if(tableOk){
+      log('— Skipping write test: no valid user id in this session.');
+    }
+  }catch(e){
+    log('✗ Unexpected: ' + e.message);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = orig;
+  }
+}
+
 /* ---------------- modal plumbing ---------------- */
 function openModal(id){ $('#'+id).classList.add('open'); }
 function closeModal(id){ $('#'+id).classList.remove('open'); }
@@ -1361,6 +1580,7 @@ document.addEventListener('click', async e => {
       break;
     case 'open-settings': openSettings(); break;
     case 'settings-save': saveSettings(); break;
+    case 'run-diagnostics': runDiagnostics(); break;
     case 'login-mode': setLoginMode(el.dataset.mode); break;
     case 'login-submit': doLogin(); break;
     case 'forgot': doForgot(); break;
@@ -1369,7 +1589,7 @@ document.addEventListener('click', async e => {
       try{ await AUTH.logout(); }catch(e){}
       clearSession();
       state.mode = 'cloud';
-      showLogin('Signed out.');
+      showLogin('✅ Signed out. See you next movie night!');
       break;
     case 'confirm-yes': if(state.confirm && state.confirm.onYes) state.confirm.onYes(); break;
     case 'confirm-no': closeModal('confirm-modal'); break;
@@ -1434,5 +1654,6 @@ async function init(){
 }
 init();
 </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a33efb257c7d0f0d',t:'MTc4ODIxMDE5Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
 </body>
 </html>

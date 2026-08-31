@@ -52,6 +52,14 @@ synopsis, ready to jog your memory.
 The anon key is deliberately safe to expose in a client-side app — it's a public
 identifier, and RLS is what actually protects your data.
 
+> **Troubleshooting:** if saving shows *"new row violates row-level security"*,
+> the table or its policies aren't set up correctly (or the auth user was
+> deleted/recreated). Re-run `supabase.sql` (safe to re-run — it drops and
+> recreates the policies), then sign out of the app and back in. You can also
+> use **⚙ Settings → Run connection diagnostics** in the app to see exactly
+> which layer is failing, and run the read-only SQL diagnostic at the bottom of
+> `supabase.sql` to check the policy state.
+
 ---
 
 ## 🔌 Step 2 — APIs used

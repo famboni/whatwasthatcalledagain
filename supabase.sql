@@ -1,6 +1,7 @@
 -- ============================================================
 -- What Was That Called Again? — Supabase schema
--- Run this once in your Supabase project: SQL Editor → New query
+-- Safe to run repeatedly: existing policies are dropped first.
+-- Run once in your Supabase project: SQL Editor → New query
 -- ============================================================
 
 create table if not exists public.watched (
@@ -51,3 +52,33 @@ create policy "own delete" on public.watched
 
 create index if not exists watched_user_idx
   on public.watched (user_id, watched_on desc);
+
+
+-- ============================================================
+-- TROUBLESHOOTING — if the app blocks saves with
+-- "new row violates row-level security", run this diagnostic
+-- (read-only, does not change any data):
+-- ============================================================
+
+select
+  (select count(*) from pg_policies where schemaname='public' and tablename='watched') as policy_count,
+  (select bool_or(policyname='own select') from pg_policies where schemaname='public' and tablename='watched') as has_select,
+  (select bool_or(policyname='own insert') from pg_policies where schemaname='public' and tablename='watched') as has_insert,
+  (select count(*) from pg_tables where schemaname='public' and tablename='watched') as table_exists;
+
+-- If has_select or has_insert is false → run the main script again.
+-- If both are true but the app still blocks saves → the auth user was
+-- likely deleted/recreated: sign out of the app and sign back in.
+
+-- Still blocked even though the above looks fine? Inspect the policy details:
+select policyname, cmd, roles::text, qual, with_check
+from pg_policies
+where schemaname = 'public' and tablename = 'watched'
+order by policyname;
+
+-- Expected: 4 rows, cmd = SELECT / INSERT / UPDATE / DELETE,
+-- roles = {authenticated}, qual = (auth.uid() = user_id),
+-- with_check = (auth.uid() = user_id) for INSERT and UPDATE.
+-- If roles shows {anon} or qual/with_check differ, delete the bad policy:
+--   drop policy if exists "<name>" on public.watched;
+-- then re-run the main script.
