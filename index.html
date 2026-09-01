@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- WWTCAA v1.4.0 — mobile UI (bottom sheets, FAB, touch targets) + RLS write fix.
+<!-- WWTCAA v1.5.0 — mobile UI (bottom sheets, FAB, touch targets) + RLS write fix.
      Verify deployed version: view page source and search for "v1.4.0" or "WRITE TEST". -->
 <html lang="en">
 <head>
@@ -153,6 +153,8 @@ select.text-input{width:auto;cursor:pointer}
 }
 .badge.series{background:var(--gold-dim);border-color:rgba(242,193,78,.35);color:var(--gold)}
 .badge.movie{background:rgba(122,92,214,.12);border-color:rgba(122,92,214,.35);color:#b7a1ff}
+.badge.want{background:rgba(95,201,139,.12);border-color:rgba(95,201,139,.35);color:#8fe3b4}
+.badge.watching{background:rgba(224,82,82,.12);border-color:rgba(224,82,82,.35);color:#ff9e9e}
 .card-stars{font-size:12.5px;letter-spacing:1px;line-height:1}
 .card-comment{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic}
 .card-date{font-size:10.5px;color:var(--faint);margin-top:auto}
@@ -305,6 +307,16 @@ textarea.comment-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(-
 .ep-row.open .ep-chev{transform:rotate(180deg)}
 .ep-loading,.section-loading{color:var(--faint);font-size:13px;padding:10px 2px}
 
+/* status pills (detail + add form) */
+.status-row{display:flex;gap:7px;flex-wrap:wrap}
+.status-btn{
+  appearance:none;background:var(--card2);border:1px solid var(--line2);color:var(--muted);
+  border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all .15s;
+}
+.status-btn:hover{color:var(--text);border-color:var(--gold)}
+.status-btn.on{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+
 /* settings */
 .set-field{margin-bottom:14px}
 .set-field label{display:block;font-size:11px;color:var(--faint);letter-spacing:1.1px;text-transform:uppercase;margin-bottom:6px}
@@ -354,8 +366,8 @@ details.setup pre{
 
   /* header */
   header{padding:calc(8px + env(safe-area-inset-top)) 14px 8px;gap:8px}
-  .brand .reel{width:34px;height:34px;font-size:17px;border-radius:10px}
-  .brand h1{font-size:16px}
+  .brand .reel{width:36px;height:36px;font-size:18px;border-radius:10px}
+  .brand h1{font-size:19px}
   .brand small{display:none}
   .chip{display:none}
   #logout-btn{display:none !important} /* sign out lives in ⚙ Settings on mobile */
@@ -363,28 +375,30 @@ details.setup pre{
 
   main{padding:18px 14px calc(96px + env(safe-area-inset-bottom))}
 
-  /* stats 2×2 */
+  /* stats 2×2 — big numbers */
   .stats{grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat{padding:12px 14px}
-  .stat .n{font-size:22px}
-  .stat .l{font-size:10.5px}
+  .stat{padding:14px 14px}
+  .stat .n{font-size:32px}
+  .stat .l{font-size:12px;letter-spacing:1px;color:var(--muted)}
 
   /* toolbar: search full width, tabs scrollable, sort full width, add via FAB */
   .toolbar{display:grid;grid-template-columns:1fr;gap:10px}
   .search-box{grid-column:1/-1}
   .search-box input{min-height:46px;padding:12px 12px 12px 40px;font-size:16px}
   .tabs{grid-column:1/-1;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;justify-content:flex-start}
-  .tab{flex:none;min-height:42px;padding:8px 15px;font-size:14px}
+  .tab{flex:none;min-height:44px;padding:9px 15px;font-size:14px}
   #sort-select{width:100%;min-height:46px}
   .toolbar .btn-gold{display:none} /* replaced by the floating ＋ button */
 
-  /* cards: comfortable 2-column grid */
-  .grid{grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr));gap:12px}
-  .card-title{font-size:15px}
-  .card-meta{font-size:12px}
-  .card-stars{font-size:13px}
-  .card-comment{font-size:12.5px}
-  .card-date{font-size:11px}
+  /* cards: 3 tiles across so posters are naturally bigger */
+  .grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .card-body{padding:8px 9px 10px}
+  .card-title{font-size:13.5px}
+  .card-meta{font-size:11px;gap:4px}
+  .card-stars{font-size:11.5px}
+  .card-comment{font-size:11.5px}
+  .card-date{font-size:10px}
+  .badge{font-size:8.5px;padding:2px 5px}
 
   /* floating add button */
   .fab{
@@ -413,8 +427,9 @@ details.setup pre{
     margin:-16px -16px 14px;padding:14px 16px 10px;
     background:#12151c;border-bottom:1px solid var(--line);
   }
-  .modal-head h2{font-size:17px}
+  .modal-head h2{font-size:19px}
   .modal-x{width:40px;height:40px}
+  .status-btn{min-height:42px;padding:8px 15px;font-size:13.5px}
   .modal-foot{flex-wrap:wrap;gap:10px}
   .modal-foot .btn{flex:1 1 45%;justify-content:center;min-height:46px}
   #confirm-modal .modal-foot .btn{flex:1 1 auto}
@@ -509,6 +524,9 @@ details.setup pre{
     <div class="toolbar">
       <div class="tabs" id="tabs">
         <button class="tab on" data-action="tab" data-filter="all" id="tab-all">All <span class="cnt"></span></button>
+        <button class="tab" data-action="tab" data-filter="want" id="tab-want">🍿 To watch <span class="cnt"></span></button>
+        <button class="tab" data-action="tab" data-filter="watching" id="tab-watching">🔥 Watching <span class="cnt"></span></button>
+        <button class="tab" data-action="tab" data-filter="watched" id="tab-watched">✅ Watched <span class="cnt"></span></button>
         <button class="tab" data-action="tab" data-filter="movie" id="tab-movie">🎥 Movies <span class="cnt"></span></button>
         <button class="tab" data-action="tab" data-filter="series" id="tab-series">📺 TV <span class="cnt"></span></button>
       </div>
@@ -517,7 +535,7 @@ details.setup pre{
         <input id="list-search" type="text" placeholder="Filter your list…" autocomplete="off">
       </div>
       <select class="text-input" id="sort-select" title="Sort">
-        <option value="recent">Recently watched</option>
+        <option value="recent">Most recent</option>
         <option value="oldest">Oldest first</option>
         <option value="rating">Highest rated</option>
         <option value="title">Title A–Z</option>
@@ -607,6 +625,7 @@ create table if not exists public.watched (
   title text not null,
   year text,
   type text not null default 'movie',
+  status text not null default 'watched',
   poster text,
   plot text,
   runtime text,
@@ -621,6 +640,7 @@ create table if not exists public.watched (
   updated_at timestamptz not null default now()
 );
 alter table public.watched enable row level security;
+alter table public.watched add column if not exists status text not null default 'watched';
 drop policy if exists "own select" on public.watched;
 create policy "own select" on public.watched for select to authenticated using (auth.uid() = user_id);
 drop policy if exists "own insert" on public.watched;
@@ -630,6 +650,7 @@ create policy "own update" on public.watched for update to authenticated using (
 drop policy if exists "own delete" on public.watched;
 create policy "own delete" on public.watched for delete to authenticated using (auth.uid() = user_id);
 create index if not exists watched_user_idx on public.watched(user_id, watched_on desc);
+create index if not exists watched_user_status_idx on public.watched(user_id, status);
 
 TROUBLESHOOTING — if saves are blocked by row-level security, run this
 diagnostic (it does not change any data):
@@ -900,7 +921,8 @@ function localDelete(id){ localWrite(localList().filter(r => r.id !== id)); }
 
 /* ---------------- unified data layer ---------------- */
 async function loadEntries(){
-  state.entries = state.mode==='cloud' ? await dbList() : localList();
+  const rows = state.mode==='cloud' ? await dbList() : localList();
+  state.entries = (rows||[]).map(r => Object.assign({status:'watched'}, r));
 }
 async function addEntry(row){
   if(state.mode==='cloud'){
@@ -1102,50 +1124,85 @@ function goLocal(){
 }
 
 /* ---------------- list rendering ---------------- */
+const STATUS_LABEL = { watched: 'Watched', watching: 'Currently watching', want: 'Want to watch' };
+function statusOf(e){ return e.status || 'watched'; }
 function visibleEntries(){
   let rows = state.entries.slice();
-  if(state.filter !== 'all') rows = rows.filter(e => e.type === state.filter);
+  const f = state.filter;
+  if(f === 'want')      rows = rows.filter(e => statusOf(e) === 'want');
+  else if(f === 'watching') rows = rows.filter(e => statusOf(e) === 'watching');
+  else if(f === 'watched')  rows = rows.filter(e => statusOf(e) === 'watched');
+  else if(f === 'movie')    rows = rows.filter(e => e.type === 'movie');
+  else if(f === 'series')   rows = rows.filter(e => e.type === 'series');
   if(state.q) rows = rows.filter(e => (e.title||'').toLowerCase().includes(state.q));
-  if(state.sort === 'recent')  rows.sort((a,b) => (b.watched_on||'').localeCompare(a.watched_on||''));
-  if(state.sort === 'oldest')  rows.sort((a,b) => (a.watched_on||'').localeCompare(b.watched_on||''));
+  /* "most recent": watched items by watched date, to-watch/watching by added date */
+  const sortKey = e => (statusOf(e) === 'watched' ? (e.watched_on||'') : (e.created_at||'')).toString();
+  if(state.sort === 'recent')  rows.sort((a,b) => sortKey(b).localeCompare(sortKey(a)));
+  if(state.sort === 'oldest')  rows.sort((a,b) => sortKey(a).localeCompare(sortKey(b)));
   if(state.sort === 'rating')  rows.sort((a,b) => (b.rating||0) - (a.rating||0) || (a.title||'').localeCompare(b.title||''));
   if(state.sort === 'title')   rows.sort((a,b) => (a.title||'').localeCompare(b.title||''));
   return rows;
 }
 function renderAll(){
   const el = $('#stats');
-  const n = state.entries.length;
+  const watchedN = state.entries.filter(e => statusOf(e)==='watched').length;
+  const wantN    = state.entries.filter(e => statusOf(e)==='want').length;
+  const watchingN= state.entries.filter(e => statusOf(e)==='watching').length;
   const movies = state.entries.filter(e => e.type==='movie').length;
   const series = state.entries.filter(e => e.type==='series').length;
-  const rated = state.entries.filter(e => e.rating);
-  const avg = rated.length ? (rated.reduce((s,e)=>s+e.rating,0)/rated.length).toFixed(1) : '–';
   el.innerHTML =
-    '<div class="stat"><div class="n">'+n+'</div><div class="l">Titles watched</div></div>' +
+    '<div class="stat"><div class="n">'+watchedN+'</div><div class="l">Titles watched</div></div>' +
+    '<div class="stat"><div class="n">'+wantN+'</div><div class="l">To-watch</div></div>' +
     '<div class="stat"><div class="n">'+movies+'</div><div class="l">Movies</div></div>' +
-    '<div class="stat"><div class="n">'+series+'</div><div class="l">TV shows</div></div>' +
-    '<div class="stat"><div class="n">'+avg+'<span style="font-size:14px;color:var(--faint)">★</span></div><div class="l">Avg rating</div></div>';
-  $('#tab-all .cnt').textContent = n ? '('+n+')' : '';
+    '<div class="stat"><div class="n">'+series+'</div><div class="l">TV shows</div></div>';
+  $('#tab-all .cnt').textContent = state.entries.length ? '('+state.entries.length+')' : '';
+  $('#tab-want .cnt').textContent = wantN ? '('+wantN+')' : '';
+  $('#tab-watching .cnt').textContent = watchingN ? '('+watchingN+')' : '';
+  $('#tab-watched .cnt').textContent = watchedN ? '('+watchedN+')' : '';
   $('#tab-movie .cnt').textContent = movies ? '('+movies+')' : '';
   $('#tab-series .cnt').textContent = series ? '('+series+')' : '';
   const rows = visibleEntries();
   const grid = $('#grid');
   grid.innerHTML = rows.map(cardHTML).join('');
-  $('#empty').style.display = n ? 'none' : 'block';
-  grid.style.display = n ? 'grid' : 'none';
+  const empty = $('#empty');
+  if(state.entries.length){
+    empty.style.display = 'none';
+    grid.style.display = 'grid';
+  } else {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    if(state.filter === 'want'){
+      $('.empty h2', empty).textContent = 'Nothing on your to-watch list';
+      $('.empty p', empty).textContent = 'Search for films & shows people mention and save them to watch later.';
+    } else if(state.filter === 'watching'){
+      $('.empty h2', empty).textContent = 'Not watching anything right now';
+      $('.empty p', empty).textContent = 'Mark something as “currently watching” when you start it.';
+    } else {
+      $('.empty h2', empty).textContent = 'Nothing here yet';
+      $('.empty p', empty).textContent = "Search for the film or show you've watched and add it in one tap.";
+    }
+  }
   updateModeChip();
 }
 function cardHTML(e){
-  const stars = e.rating ? '<div class="card-stars">'+starsHTML(e.rating)+'</div>' : '<div class="card-stars" style="color:var(--faint);font-size:10.5px">not rated</div>';
+  const status = statusOf(e);
+  const stars = e.rating ? '<div class="card-stars">'+starsHTML(e.rating)+'</div>' : '';
   const comment = e.comment ? '<div class="card-comment">"'+esc(e.comment)+'"</div>' : '';
+  const badge = status==='want' ? '<span class="badge want">🍿 To watch</span>'
+    : status==='watching' ? '<span class="badge watching">🔥 Watching</span>'
+    : '<span class="badge '+(e.type==='series'?'series':'movie')+'">'+(e.type==='series'?'TV':'Movie')+'</span>';
+  const dateLine = status==='watched' ? 'Watched '+fmtDate(e.watched_on)
+    : status==='want' ? 'To watch · added '+fmtDate(e.created_at)
+    : 'Currently watching';
   return '' +
   '<div class="card" data-action="open" data-id="'+esc(e.id)+'">' +
     '<div class="poster-box"><img class="poster" loading="lazy" src="'+esc(e.poster||'')+'" alt=""></div>' +
     '<div class="card-body">' +
       '<div class="card-title">'+esc(e.title)+'</div>' +
-      '<div class="card-meta"><span class="badge '+(e.type==='series'?'series':'movie')+'">'+(e.type==='series'?'TV':'Movie')+'</span><span>'+esc(e.year||'')+'</span></div>' +
+      '<div class="card-meta">'+badge+'<span>'+esc(e.year||'')+'</span></div>' +
       stars +
       comment +
-      '<div class="card-date">Watched '+fmtDate(e.watched_on)+'</div>' +
+      '<div class="card-date">'+dateLine+'</div>' +
     '</div>' +
   '</div>';
 }
@@ -1202,13 +1259,17 @@ async function pickResult(imdbID){
     const t = await tvmazeResolve(omdb.imdbID, omdb.Title, omdb.Year);
     if(t) tvmazeId = t.id;
   }
-  state.add = { omdb, tvmazeId, rating: 0, comment: '', watchedOn: todayStr() };
+  state.add = { omdb, tvmazeId, rating: 0, comment: '', watchedOn: todayStr(), status: 'watched' };
   body.innerHTML = addFormHTML(state.add);
-  makeStars($('#add-stars'), 0, v => { state.add.rating = v; });
-  $('#add-comment').value = '';
-  $('#add-watched').value = todayStr();
-  $('#add-comment').addEventListener('input', e => state.add.comment = e.target.value);
-  $('#add-watched').addEventListener('change', e => state.add.watchedOn = e.target.value);
+  wireAddForm();
+}
+function wireAddForm(){
+  const st = $('#add-stars');
+  if(st) makeStars(st, state.add.rating||0, v => { state.add.rating = v; });
+  const c = $('#add-comment');
+  if(c){ c.value = state.add.comment||''; c.addEventListener('input', e => state.add.comment = e.target.value); }
+  const w = $('#add-watched');
+  if(w){ w.value = state.add.watchedOn||todayStr(); w.addEventListener('change', e => state.add.watchedOn = e.target.value); }
 }
 function addFormHTML(a){
   const o = a.omdb || {};
@@ -1220,6 +1281,19 @@ function addFormHTML(a){
     o.Released && o.Released!=='N/A' ? o.Released : null,
     o.totalSeasons ? o.totalSeasons+' seasons' : null
   ].filter(Boolean);
+  const st = a.status || 'watched';
+  let extras;
+  if(st === 'watched'){
+    extras =
+    '<div class="sec"><h3>Your rating</h3><div id="add-stars"></div></div>' +
+    '<div class="sec"><h3>Your comment <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></h3>' +
+      '<textarea class="comment-input" id="add-comment" placeholder="What did you think?"></textarea></div>' +
+    '<div class="sec"><h3>When did you watch it?</h3><input type="date" id="add-watched" class="text-input" style="width:auto" value="'+esc(a.watchedOn||todayStr())+'"></div>';
+  } else {
+    extras =
+    '<div class="sec"><h3>Note <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></h3>' +
+      '<textarea class="comment-input" id="add-comment" placeholder="'+(st==='want'?'Why do you want to see it?':'Where are you up to?')+'"></textarea></div>';
+  }
   return '' +
   '<div class="detail-grid">' +
     '<div class="poster-box"><img class="poster" src="'+esc(poster)+'" alt=""></div>' +
@@ -1229,10 +1303,12 @@ function addFormHTML(a){
       (o.Plot && o.Plot!=='N/A' ? '<p class="plot" style="font-size:13px;line-height:1.6;color:#b9c0cb">'+esc(o.Plot)+'</p>' : '') +
     '</div>' +
   '</div>' +
-  '<div class="sec"><h3>Your rating</h3><div id="add-stars"></div></div>' +
-  '<div class="sec"><h3>Your comment <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></h3>' +
-    '<textarea class="comment-input" id="add-comment" placeholder="What did you think?"></textarea></div>' +
-  '<div class="sec"><h3>When did you watch it?</h3><input type="date" id="add-watched" class="text-input" style="width:auto" value="'+esc(a.watchedOn)+'"></div>' +
+  '<div class="sec"><h3>Status</h3><div class="status-row">' +
+    '<button class="status-btn'+(st==='watched'?' on':'')+'" data-action="add-status" data-status="watched">✅ Watched</button>' +
+    '<button class="status-btn'+(st==='watching'?' on':'')+'" data-action="add-status" data-status="watching">🔥 Currently watching</button>' +
+    '<button class="status-btn'+(st==='want'?' on':'')+'" data-action="add-status" data-status="want">🍿 Want to watch</button>' +
+  '</div></div>' +
+  extras +
   '<div class="modal-foot">' +
     '<button class="btn btn-ghost" data-action="back-to-search">Cancel</button>' +
     '<button class="btn btn-gold" data-action="save-add">Save to my watchlist</button>' +
@@ -1251,6 +1327,7 @@ async function saveAdd(){
   }
   const o = a.omdb || {};
   const type = (o.Type||'movie') === 'series' ? 'series' : 'movie';
+  const status = a.status || 'watched';
   const row = {
     id: uid(),
     user_id: (state.mode==='cloud' && state.session) ? state.session.id : null,
@@ -1259,6 +1336,7 @@ async function saveAdd(){
     title: o.Title || 'Untitled',
     year: o.Year || '',
     type,
+    status,
     poster: (o.Poster && o.Poster!=='N/A') ? o.Poster : null,
     plot: (o.Plot && o.Plot!=='N/A') ? o.Plot : '',
     runtime: (o.Runtime && o.Runtime!=='N/A') ? o.Runtime : '',
@@ -1266,9 +1344,9 @@ async function saveAdd(){
     director: (o.Director && o.Director!=='N/A') ? o.Director : '',
     actors: (o.Actors && o.Actors!=='N/A') ? o.Actors : '',
     imdb_rating: (o.imdbRating && o.imdbRating!=='N/A') ? o.imdbRating : '',
-    rating: a.rating || null,
+    rating: status==='watched' ? (a.rating || null) : null,
     comment: a.comment || '',
-    watched_on: a.watchedOn || todayStr(),
+    watched_on: status==='watched' ? (a.watchedOn || todayStr()) : null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
@@ -1308,6 +1386,7 @@ function showManualForm(){
     '<div class="sec"><h3>Title</h3><input class="text-input" id="man-title" placeholder="Title" style="margin-top:6px"></div>' +
     '<div class="sec"><h3>Year</h3><input class="text-input" id="man-year" placeholder="e.g. 1999" style="margin-top:6px;width:140px"></div>' +
     '<div class="sec"><h3>Type</h3><select class="text-input" id="man-type" style="margin-top:6px"><option value="movie">Movie</option><option value="series">TV series</option></select></div>' +
+    '<div class="sec"><h3>Status</h3><select class="text-input" id="man-status" style="margin-top:6px"><option value="watched">✅ Watched</option><option value="watching">🔥 Currently watching</option><option value="want">🍿 Want to watch</option></select></div>' +
     '<div class="sec"><h3>Poster URL (optional)</h3><input class="text-input" id="man-poster" placeholder="https://…" style="margin-top:6px"></div>' +
     '<div class="modal-foot">' +
       '<button class="btn btn-ghost" data-action="back-to-search">Cancel</button>' +
@@ -1325,16 +1404,18 @@ async function saveManual(){
       return;
     }
   }
+  const status = $('#man-status').value || 'watched';
   const row = {
     id: uid(),
     user_id: (state.mode==='cloud' && state.session) ? state.session.id : null,
     imdb_id: null, tvmaze_id: null,
     title, year: $('#man-year').value.trim(),
     type: $('#man-type').value,
+    status,
     poster: $('#man-poster').value.trim() || null,
     plot: '', runtime: '', genre: '', director: '', actors: '', imdb_rating: '',
     rating: null, comment: '',
-    watched_on: todayStr(),
+    watched_on: status==='watched' ? todayStr() : null,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString()
   };
   try{
@@ -1390,6 +1471,7 @@ function maxSeason(eps){
 function renderDetailShell(entry){
   const d = state.detail;
   const o = d.omdb || {};
+  const status = statusOf(entry);
   const poster = (o.Poster && o.Poster!=='N/A') ? o.Poster : (entry.poster||'');
   const chips = [];
   if(o.Runtime && o.Runtime!=='N/A') chips.push(['Runtime', o.Runtime]);
@@ -1421,10 +1503,20 @@ function renderDetailShell(entry){
       '<div class="dm-title">'+esc(entry.title)+' <span class="dm-year">('+esc(entry.year||'')+')</span></div>' +
       '<div class="dm-meta">' + chips.map(c=>'<span class="chip2"><b>'+esc(c[0])+':</b> '+esc(c[1])+'</span>').join('') + '</div>' +
       '<div class="notes-box">' +
-        '<div class="label">Your notes</div>' +
-        '<div class="notes-row" id="note-stars">' + (entry.rating ? starsHTML(entry.rating,'big') : '<span style="color:var(--faint);font-size:13px">Not rated yet</span>') + '</div>' +
-        '<div style="margin-top:8px" class="note-comment">' + (entry.comment ? esc(entry.comment) : '<span style="color:var(--faint);font-size:12.5px">No comment.</span>') + '</div>' +
-        '<div style="margin-top:8px;font-size:12px;color:var(--faint)">Watched on <b style="color:var(--muted)">'+fmtDate(entry.watched_on)+'</b></div>' +
+        '<div class="label">Status</div>' +
+        '<div class="status-row">' +
+          '<button class="status-btn'+(status==='watched'?' on':'')+'" data-action="set-status" data-status="watched">✅ Watched</button>' +
+          '<button class="status-btn'+(status==='watching'?' on':'')+'" data-action="set-status" data-status="watching">🔥 Watching</button>' +
+          '<button class="status-btn'+(status==='want'?' on':'')+'" data-action="set-status" data-status="want">🍿 Want to watch</button>' +
+        '</div>' +
+        (status==='watched'
+          ? '<div style="margin-top:12px" class="notes-row" id="note-stars">' + (entry.rating ? starsHTML(entry.rating,'big') : '<span style="color:var(--faint);font-size:13px">Not rated yet</span>') + '</div>' +
+            '<div style="margin-top:8px" class="note-comment">' + (entry.comment ? esc(entry.comment) : '<span style="color:var(--faint);font-size:12.5px">No comment.</span>') + '</div>' +
+            '<div style="margin-top:8px;font-size:12px;color:var(--faint)">Watched on <b style="color:var(--muted)">'+fmtDate(entry.watched_on)+'</b></div>'
+          : '<div style="margin-top:12px" class="note-comment">' + (entry.comment ? esc(entry.comment) : '<span style="color:var(--faint);font-size:12.5px">'+(status==='want'?'Waiting to be watched.':'In progress — where are you up to?')+'</span>') + '</div>' +
+            '<div style="margin-top:8px;font-size:12px;color:var(--faint)">Added '+fmtDate(entry.created_at)+'</div>' +
+            '<div style="margin-top:12px"><button class="btn btn-gold" style="padding:7px 14px;font-size:12.5px" data-action="mark-watched">✅ Mark as watched</button></div>'
+        ) +
         '<div style="margin-top:12px;display:flex;gap:8px">' +
           '<button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" data-action="edit">✏️ Edit</button>' +
           '<button class="btn btn-danger" style="padding:6px 12px;font-size:12px" data-action="delete">Remove</button>' +
@@ -1479,8 +1571,15 @@ function enterEditMode(){
   if(!d) return;
   const box = $('.notes-box');
   if(!box) return;
+  const st = statusOf(d.entry);
   box.innerHTML = '' +
-  '<div class="label">Your rating</div>' +
+  '<div class="label">Status</div>' +
+  '<select class="text-input" id="edit-status" style="width:auto">' +
+    '<option value="watched">✅ Watched</option>' +
+    '<option value="watching">🔥 Currently watching</option>' +
+    '<option value="want">🍿 Want to watch</option>' +
+  '</select>' +
+  '<div class="label" style="margin-top:14px">Your rating</div>' +
   '<div class="notes-row" id="edit-stars"></div>' +
   '<div class="label" style="margin-top:14px">Your comment</div>' +
   '<textarea class="comment-input" id="edit-comment">'+esc(d.entry.comment||'')+'</textarea>' +
@@ -1490,16 +1589,19 @@ function enterEditMode(){
     '<button class="btn btn-gold" style="padding:6px 14px;font-size:12.5px" data-action="save-edit">Save changes</button>' +
     '<button class="btn btn-ghost" style="padding:6px 14px;font-size:12.5px" data-action="cancel-edit">Cancel</button>' +
   '</div>';
+  $('#edit-status').value = st;
   makeStars($('#edit-stars'), d.entry.rating||0, v => d.editRating = v);
   d.editRating = d.entry.rating||0;
 }
 async function saveEdit(){
   const d = state.detail;
   if(!d) return;
+  const status = $('#edit-status').value || 'watched';
   const patch = {
-    rating: d.editRating||null,
+    status,
+    rating: status==='watched' ? (d.editRating||null) : null,
     comment: $('#edit-comment').value.trim(),
-    watched_on: $('#edit-watched').value || todayStr()
+    watched_on: status==='watched' ? ($('#edit-watched').value || todayStr()) : null
   };
   try{
     const updated = await updateEntry(d.entry.id, patch);
@@ -1508,6 +1610,76 @@ async function saveEdit(){
     renderDetailShell(updated);
     toast('Changes saved ✓', 'ok');
   }catch(e){ toast('Could not save: '+e.message, 'err'); }
+}
+/* guided "mark as watched" flow for want/watching entries */
+function enterMarkWatched(){
+  const d = state.detail;
+  if(!d) return;
+  const box = $('.notes-box');
+  if(!box) return;
+  box.innerHTML = '' +
+  '<div class="label">Mark as watched</div>' +
+  '<div class="label" style="margin-top:8px">Your rating</div>' +
+  '<div class="notes-row" id="mark-stars"></div>' +
+  '<div class="label" style="margin-top:12px">Comment (optional)</div>' +
+  '<textarea class="comment-input" id="mark-comment">'+esc(d.entry.comment||'')+'</textarea>' +
+  '<div class="label" style="margin-top:12px">Watched on</div>' +
+  '<input type="date" id="mark-watched" class="text-input" style="width:auto" value="'+todayStr()+'">' +
+  '<div style="margin-top:14px;display:flex;gap:8px">' +
+    '<button class="btn btn-gold" style="padding:6px 14px;font-size:12.5px" data-action="save-mark-watched">Save</button>' +
+    '<button class="btn btn-ghost" style="padding:6px 14px;font-size:12.5px" data-action="cancel-edit">Cancel</button>' +
+  '</div>';
+  makeStars($('#mark-stars'), 0, v => state.markRating = v);
+  state.markRating = 0;
+}
+async function saveMarkWatched(){
+  const d = state.detail;
+  if(!d) return;
+  const patch = {
+    status: 'watched',
+    rating: state.markRating||null,
+    comment: $('#mark-comment').value.trim(),
+    watched_on: $('#mark-watched').value || todayStr()
+  };
+  try{
+    const updated = await updateEntry(d.entry.id, patch);
+    d.entry = updated;
+    renderAll();
+    renderDetailShell(updated);
+    toast('“'+updated.title+'” marked as watched 🎉', 'ok');
+  }catch(e){ toast('Could not save: '+e.message, 'err'); }
+}
+function changeStatus(target){
+  const d = state.detail;
+  if(!d) return;
+  const cur = statusOf(d.entry);
+  if(target === cur) return;
+  /* moving to watched: guided flow (date + rating + comment) */
+  if(target === 'watched'){ enterMarkWatched(); return; }
+  const doSet = async () => {
+    try{
+      const updated = await updateEntry(d.entry.id, { status: target, watched_on: null, rating: null });
+      closeModal('confirm-modal');
+      d.entry = updated;
+      renderAll();
+      renderDetailShell(updated);
+      toast('Moved to “'+STATUS_LABEL[target]+'”.', 'ok');
+    }catch(e){ toast('Could not update: '+e.message, 'err'); }
+  };
+  if(cur === 'watched'){
+    state.confirm = {
+      title: 'Change status?',
+      text: '“'+d.entry.title+'” will move to “'+STATUS_LABEL[target]+'”. Its watched date and rating will be cleared.',
+      yesLabel: 'Move',
+      onYes: doSet
+    };
+    $('#confirm-title').textContent = state.confirm.title;
+    $('#confirm-text').textContent = state.confirm.text;
+    $('#confirm-yes').textContent = state.confirm.yesLabel;
+    openModal('confirm-modal');
+  } else {
+    doSet();
+  }
 }
 function askDelete(entry){
   state.confirm = {
@@ -1695,6 +1867,14 @@ document.addEventListener('click', async e => {
     case 'edit': enterEditMode(); break;
     case 'save-edit': saveEdit(); break;
     case 'cancel-edit': renderDetailShell(state.detail ? state.detail.entry : null); if(state.detail && state.detail.episodes) renderEpisodes(); break;
+    case 'mark-watched': enterMarkWatched(); break;
+    case 'save-mark-watched': saveMarkWatched(); break;
+    case 'set-status': changeStatus(el.dataset.status); break;
+    case 'add-status':
+      state.add.status = el.dataset.status;
+      $('#add-form-body').innerHTML = addFormHTML(state.add);
+      wireAddForm();
+      break;
     case 'delete': if(state.detail) askDelete(state.detail.entry); break;
     case 'season':
       state.detail.season = parseInt(el.dataset.season,10);
@@ -1789,5 +1969,5 @@ async function init(){
 }
 init();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a33f08450e44ae2b',t:'MTc4ODIxMDczNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a341de6a1d0d1411',t:'MTc4ODI0MDQ3Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

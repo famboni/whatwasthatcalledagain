@@ -12,6 +12,7 @@ create table if not exists public.watched (
   title       text not null,
   year        text,
   type        text not null default 'movie',          -- 'movie' | 'series'
+  status      text not null default 'watched',     -- 'watched' | 'watching' | 'want'
   poster      text,
   plot        text,
   runtime     text,
@@ -28,6 +29,9 @@ create table if not exists public.watched (
 
 -- Row Level Security: every user only sees/edits their own rows.
 alter table public.watched enable row level security;
+-- For existing tables (safe to run repeatedly):
+alter table public.watched add column if not exists status text not null default 'watched';
+
 
 drop policy if exists "own select" on public.watched;
 create policy "own select" on public.watched
@@ -52,6 +56,8 @@ create policy "own delete" on public.watched
 
 create index if not exists watched_user_idx
   on public.watched (user_id, watched_on desc);
+create index if not exists watched_user_status_idx
+  on public.watched (user_id, status);
 
 
 -- ============================================================

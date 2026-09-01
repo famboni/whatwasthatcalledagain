@@ -78,6 +78,10 @@ details rather than breaking.
 ## ✨ Features
 
 - **Add with one search** — live OMDB results with posters; full details pre-filled.
+- **Three statuses** — ✅ Watched, 🔥 Currently watching, or 🍿 Want to watch
+  (save things people mention to watch later). Filter tabs for each, with counts.
+- **Guided "mark as watched"** — when you finish something from your to-watch
+  list, tap the button and add the date, a 1–5 star rating and a comment in one go.
 - **1–5 star rating** + optional comment + date watched, for every title.
 - **Click any card** to open the detail view:
   - Cast, director, writer, synopsis, runtime, genre, release date, MPAA rating
@@ -92,7 +96,8 @@ details rather than breaking.
   entries stay in that browser).
 - **Mobile-friendly** — works great on phones: floating ＋ button, bottom-sheet
   dialogs, thumb-friendly touch targets, no iOS zoom-on-focus, safe-area support
-  for notched screens. Desktop layout is unchanged.
+  for notched screens. Three tiles across with big posters, large stat numbers
+  and headings. Desktop layout is unchanged.
 - **Keyboard friendly** — `/` focuses search, `Esc` closes dialogs.
 
 ---
@@ -102,7 +107,7 @@ details rather than breaking.
 | File | Purpose |
 | --- | --- |
 | `index.html` | The entire app (HTML + CSS + JS, zero dependencies) |
-| `supabase.sql` | One-time Supabase schema + security policies |
+| `supabase.sql` | One-time schema + policies (safe to re-run; adds the `status` column) |
 | `README.md` | This file |
 
 ---
