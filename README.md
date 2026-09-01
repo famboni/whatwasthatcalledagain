@@ -52,6 +52,13 @@ synopsis, ready to jog your memory.
 The anon key is deliberately safe to expose in a client-side app — it's a public
 identifier, and RLS is what actually protects your data.
 
+> **Troubleshooting (statuses):** if saving a "Want to watch" or "Currently
+> watching" title shows *"null value in column watched_on violates not-null
+> constraint"*, your database still has `watched_on NOT NULL` — re-run
+> `supabase.sql` (it now includes `ALTER TABLE ... ALTER COLUMN watched_on
+> DROP NOT NULL`). The app intentionally stores no watched date until you mark
+> something as watched.
+>
 > **Troubleshooting:** if saving shows *"new row violates row-level security"*,
 > the table or its policies aren't set up correctly (or the auth user was
 > deleted/recreated). Re-run `supabase.sql` (safe to re-run — it drops and

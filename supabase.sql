@@ -22,7 +22,7 @@ create table if not exists public.watched (
   imdb_rating text,
   rating      smallint check (rating between 1 and 5), -- your 1-5 stars
   comment     text,
-  watched_on  date not null default current_date,
+  watched_on  date default current_date,              -- nullable: only set when status = 'watched'
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
@@ -31,6 +31,7 @@ create table if not exists public.watched (
 alter table public.watched enable row level security;
 -- For existing tables (safe to run repeatedly):
 alter table public.watched add column if not exists status text not null default 'watched';
+alter table public.watched alter column watched_on drop not null;
 
 
 drop policy if exists "own select" on public.watched;
